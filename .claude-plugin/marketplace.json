@@ -1,0 +1,13 @@
+{
+  "name": "cpzai-plugin",
+  "owner": {
+    "name": "CPZ Lab"
+  },
+  "plugins": [
+    {
+      "name": "cpzai",
+      "source": ".",
+      "description": "AI-native systematic trading — build strategies, backtest, manage risk, and execute trades. Connects to CPZAI Quant Studio for live portfolio, market data, and order management."
+    }
+  ]
+}
