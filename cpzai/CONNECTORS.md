@@ -2,7 +2,7 @@
 
 ## How tool references work
 
-Plugin files use `~~cpzai` as a placeholder for the CPZAI Quant Studio MCP server. All tools require a valid CPZ API key and secret — the plugin does not grant platform access.
+Plugin files use `~~cpzai` as a placeholder for the CPZAI MCP server. All tools require a valid CPZ API key and secret — the plugin does not grant platform access.
 
 ## Authentication
 

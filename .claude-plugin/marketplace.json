@@ -7,7 +7,7 @@
     {
       "name": "cpzai",
       "source": "./cpzai",
-      "description": "AI-native systematic trading — build strategies, backtest, manage risk, and execute trades. Connects to CPZAI Quant Studio for live portfolio, market data, and order management."
+      "description": "AI-native systematic trading — build strategies, backtest, manage risk, and execute trades. Connects to CPZAI for live portfolio, market data, and order management."
     }
   ]
 }

@@ -19,13 +19,13 @@
 
 A plugin that turns Claude into a systematic trading specialist. Built for [Cowork](https://claude.com/product/cowork), also compatible with [Claude Code](https://claude.com/product/claude-code).
 
-Build quantitative strategies, backtest them against historical data, monitor risk in real time, and execute trades — all through natural conversation with Claude, powered by [CPZAI Quant Studio](https://ai.cpz-lab.com).
+Build quantitative strategies, backtest them against historical data, monitor risk in real time, and execute trades — all through natural conversation with Claude, powered by [CPZAI](https://ai.cpz-lab.com).
 
 > **Important**: This plugin assists with trading and investment workflows but does not provide financial advice. All trading decisions carry risk of loss and should be made by qualified individuals. Past performance does not guarantee future results.
 
 ## Prerequisites
 
-You need a CPZAI Quant Studio account with API credentials. The plugin connects to the CPZAI MCP server — without valid credentials, no tools are accessible.
+You need a CPZAI account with API credentials. The plugin connects to the CPZAI MCP server — without valid credentials, no tools are accessible.
 
 1. Sign up at [ai.cpz-lab.com](https://ai.cpz-lab.com)
 2. Go to **Settings → API Keys** and generate a key pair
@@ -142,6 +142,6 @@ Apache 2.0 — see [LICENSE](LICENSE).
 
 <div align="center">
 
-Built by [CPZ Lab](https://www.cpz-lab.com/) — [CPZAI Quant Studio](https://ai.cpz-lab.com)
+Built by [CPZ Lab](https://www.cpz-lab.com/) — [CPZAI](https://ai.cpz-lab.com)
 
 </div>
