@@ -1,4 +1,21 @@
+<div align="center">
+
+<a href="https://ai.cpz-lab.com">
+  <img src="https://drive.google.com/uc?id=1PXRTr7fd7ONFUblpuXZsvl457wWTwjzb" alt="CPZAI" width="150">
+</a>
+
 # CPZAI — Systematic Trading Plugin
+
+**AI-Native Quantitative Trading for Claude**
+
+[![Claude Cowork](https://img.shields.io/badge/Claude-Cowork-000000?logo=anthropic&logoColor=white)](https://claude.com/product/cowork)
+[![Claude Code](https://img.shields.io/badge/Claude-Code-000000?logo=anthropic&logoColor=white)](https://claude.com/product/claude-code)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue)](LICENSE)
+[![Skills](https://img.shields.io/badge/Skills-9-green)]()
+[![Commands](https://img.shields.io/badge/Commands-5-green)]()
+[![MCP Tools](https://img.shields.io/badge/MCP_Tools-18-green)]()
+
+</div>
 
 A plugin that turns Claude into a systematic trading specialist. Built for [Cowork](https://claude.com/product/cowork), also compatible with [Claude Code](https://claude.com/product/claude-code).
 
@@ -120,3 +137,11 @@ The plugin authenticates via your MCP client's server configuration. Add your cr
 ## License
 
 Apache 2.0 — see [LICENSE](LICENSE).
+
+---
+
+<div align="center">
+
+Built by [CPZ Lab](https://www.cpz-lab.com/) — [CPZAI Quant Studio](https://ai.cpz-lab.com)
+
+</div>
