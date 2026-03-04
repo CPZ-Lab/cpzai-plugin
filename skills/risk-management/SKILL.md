@@ -157,9 +157,17 @@ Construct hypothetical shocks:
 
 Apply betas and correlations to estimate portfolio impact under each scenario.
 
-## CPZAI Risk Tools
+## CPZAI Tool Chaining for Risk Analysis
 
-The CPZAI MCP server provides:
-- `compute_risk` — fresh risk snapshot (VaR, Sharpe, drawdown, beta, risk score)
-- `list_risk_snapshots` — historical risk data for trend analysis
-- `list_positions` — current portfolio for position-level analysis
+When ~~cpzai is connected, execute this workflow:
+
+1. **`list_positions`** — get all open positions with market values and entry prices
+2. **`list_accounts`** — get account equity, buying power, margin usage
+3. **`get_market_data`** — fetch current prices for all held symbols (for real-time P&L)
+4. **`compute_risk`** — trigger a fresh risk computation (VaR, Sharpe, drawdown, beta, risk score)
+5. **`list_risk_snapshots`** — pull historical risk data (last 30 snapshots) for trend analysis
+6. **Synthesize:** combine position data with risk metrics to identify concentration, correlation clusters, and exposure limit violations. Compare current risk score to the 30-day trend. Flag deterioration.
+
+If risk flags are identified:
+7. **`place_order`** — execute risk-reduction trades (trim oversized positions, add hedges)
+8. **`compute_risk`** — recompute to verify improvement after adjustments

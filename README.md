@@ -52,6 +52,9 @@ Skills activate automatically when Claude detects relevant context:
 | `order-execution` | Placing trades, order types, execution quality, slippage |
 | `market-data` | Fetching quotes, technical analysis, corporate actions, data quality |
 | `portfolio-analytics` | Performance measurement, attribution, benchmarking, rebalancing |
+| `portfolio-optimization` | Mean-variance, Black-Litterman, HRP, efficient frontier, constraints |
+| `volatility-and-derivatives` | Greeks, GARCH, vol surface, skew, options strategies, VIX |
+| `alpha-research` | IC/IR analysis, feature engineering, ML cross-validation, signal decay |
 
 ## MCP Tools
 
@@ -64,6 +67,8 @@ The CPZAI MCP server provides 18 tools:
 - **Risk** — compute VaR, Sharpe, drawdown, beta; track risk history
 - **Execution** — run strategies on the compute backend
 - **Webhooks** — subscribe to platform events (fills, alerts)
+
+Each skill includes **tool chaining workflows** that specify the exact sequence of MCP tool calls for common tasks (e.g. "risk check" = `list_positions` -> `get_market_data` -> `compute_risk` -> synthesize).
 
 See [CONNECTORS.md](CONNECTORS.md) for the full tool reference.
 

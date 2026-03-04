@@ -173,11 +173,21 @@ Include:
 5. Portfolio changes (new positions, exits)
 6. Outlook / plan for next month
 
-## CPZAI Portfolio Tools
+## CPZAI Tool Chaining for Portfolio Analytics
 
-- `list_positions` — current holdings with P&L
-- `list_accounts` — account summaries (equity, buying power)
-- `compute_risk` — risk metrics (VaR, Sharpe, drawdown, beta)
-- `list_risk_snapshots` — historical risk data for trending
-- `get_market_data` — real-time prices for performance calculation
-- `sync_portfolio` — force-sync across connected brokers
+When ~~cpzai is connected, execute this workflow:
+
+1. **`sync_portfolio`** — force-sync all broker accounts to ensure positions are current
+2. **`list_positions`** — get all holdings with quantity, entry price, and current P&L
+3. **`list_accounts`** — get account equity, cash, buying power, margin
+4. **`get_market_data`** — fetch current prices for all held symbols (for real-time valuation)
+5. **`compute_risk`** — get VaR, Sharpe, Sortino, beta, max drawdown, risk score
+6. **`list_risk_snapshots`** — pull 30-day risk history for trend analysis
+7. **`list_orders`** (status=filled, last 30 days) — recent trade history for activity analysis
+
+**Synthesize:** combine all data into a complete portfolio review:
+- Compute weights from position values / total equity
+- Run attribution analysis (sector decomposition, factor exposure)
+- Compare risk metrics to historical average from snapshots
+- Flag concentration, correlation, and drawdown concerns
+- Identify winners/losers and assess holding periods

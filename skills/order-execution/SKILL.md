@@ -135,10 +135,26 @@ Available for users who need:
 3. For strategies, prefer limit orders with a small buffer above/below current price
 4. Monitor order status — don't assume fills; handle rejections and partial fills
 
-## CPZAI Execution Tools
+## CPZAI Tool Chaining for Order Execution
 
-- `place_order` — submit market, limit, or stop orders through connected broker
-- `list_orders` — view order history and status (open, filled, cancelled)
-- `list_positions` — check current positions
-- `sync_portfolio` — force-sync positions across all connected accounts
-- `list_accounts` — view connected broker accounts
+When ~~cpzai is connected, execute this workflow:
+
+**Pre-trade:**
+1. **`list_accounts`** — verify which broker accounts are connected and check buying power
+2. **`list_positions`** — check current holdings to avoid duplicates or unintended concentration
+3. **`get_market_data`** — get current price, bid/ask spread, and volume for the target symbol
+4. **`compute_risk`** — evaluate current portfolio risk before adding new exposure
+
+**Execution:**
+5. **`place_order`** — submit the order (market, limit, or stop) through the connected broker. For limit orders, reference the current bid/ask from step 3.
+
+**Post-trade:**
+6. **`list_orders`** — verify fill status (filled, partial, rejected). If partially filled, decide whether to chase or cancel remainder.
+7. **`sync_portfolio`** — force-sync to reconcile positions across accounts
+8. **`compute_risk`** — recompute risk metrics to verify the new position hasn't pushed the portfolio outside risk limits
+
+**For strategy-driven execution:**
+1. **`execute_strategy`** — run the strategy to generate signals
+2. **`list_positions`** — compare current holdings to target portfolio
+3. **`place_order`** (multiple) — execute the rebalancing trades
+4. **`sync_portfolio`** — reconcile after all orders fill

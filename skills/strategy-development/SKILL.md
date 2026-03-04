@@ -116,30 +116,15 @@ Optimal sizing: `f = (p * b - q) / b` where p = win probability, b = win/loss ra
 ### Signal-Weighted
 Size proportional to signal strength. Stronger signals get larger positions. Requires well-calibrated signal magnitudes.
 
-## CPZAI Strategy Structure
+## CPZAI MCP Tools for Strategy Development
 
-Strategies on CPZAI use the `cpz` SDK:
+When ~~cpzai is connected, use these tools in sequence:
 
-```python
-from cpz import Strategy
+1. **`list_strategies`** — browse existing strategies for inspiration or iteration
+2. **`get_strategy`** — inspect a specific strategy's configuration and parameters
+3. **`create_strategy`** — create a new strategy from generated Python code
+4. **`update_strategy`** — modify parameters or code of an existing strategy
+5. **`execute_strategy`** — run the strategy on the compute backend (backtest or live)
+6. **`get_backtest_results`** — pull performance metrics after execution
 
-class MyStrategy(Strategy):
-    def __init__(self):
-        self.lookback = 20
-        self.threshold = 2.0
-
-    def on_bar(self, bar):
-        # Core logic: compute signal, generate orders
-        pass
-
-    def on_fill(self, fill):
-        # Handle fills, update state
-        pass
-```
-
-Key methods:
-- `on_bar(bar)` — called on each new price bar; this is where signal logic lives
-- `on_fill(fill)` — called when an order is filled; use for bookkeeping
-- `self.order(symbol, qty)` — submit an order
-- `self.position(symbol)` — check current position
-- `self.data(symbol, field, lookback)` — access historical data
+**Workflow:** Design the signal logic using the frameworks above, then call `create_strategy` to deploy it. Follow up with `execute_strategy` to backtest, and `get_backtest_results` to evaluate. Iterate by calling `update_strategy` with refined parameters.

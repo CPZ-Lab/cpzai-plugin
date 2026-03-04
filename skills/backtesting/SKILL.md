@@ -154,8 +154,16 @@ Resample trades with replacement to estimate confidence intervals around key met
 - Assume 20-50 bps round-trip for small-cap or less liquid names
 - If your strategy's gross Sharpe drops below 1.0 after costs, reconsider
 
-## CPZAI Backtest Tools
+## CPZAI Tool Chaining for Backtesting
 
-- `execute_strategy` — run a strategy on the compute backend (backtest or live)
-- `get_backtest_results` — retrieve results with full metrics
-- `get_strategy` — inspect strategy code and parameters before testing
+When ~~cpzai is connected, execute this workflow:
+
+1. **`list_strategies`** — find the strategy to test (filter by name, type, or status)
+2. **`get_strategy`** — inspect the strategy's code, parameters, and configuration
+3. **`execute_strategy`** — run the backtest with specified date range and parameters
+4. **`get_backtest_results`** — pull the full results (returns, Sharpe, drawdown, trade log)
+5. **Analyze:** apply the metrics framework and robustness checks from this skill. Identify overfitting risks, regime sensitivity, and transaction cost impact.
+6. **`update_strategy`** — adjust parameters based on findings
+7. **Iterate:** repeat steps 3-5 with modified parameters. Compare results across runs to assess parameter sensitivity.
+
+**Guardrail:** If testing multiple parameter sets, track all results — not just the best one. Report how many configurations were tested and the distribution of outcomes to avoid selection bias.

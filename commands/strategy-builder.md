@@ -42,34 +42,15 @@ If any critical element is missing, ask one focused follow-up question. Don't as
 
 ### 2. Generate the Strategy Code
 
-Write a complete Python strategy file following CPZAI conventions:
-
-```python
-import cpz
-from cpz import Strategy, Signal, Order
-
-class MyStrategy(Strategy):
-    def __init__(self):
-        # Parameters with sensible defaults
-        ...
-
-    def on_bar(self, bar):
-        # Core signal logic
-        ...
-
-    def on_fill(self, fill):
-        # Fill handling
-        ...
-```
+Write a complete Python strategy following standard systematic trading conventions:
 
 Requirements:
-- Use the `cpz` SDK imports
-- Inherit from `Strategy` base class
-- Implement `on_bar` for signal logic
-- Include clear parameter definitions with defaults
-- Add position sizing logic
-- Add risk checks (max position size, exposure limits)
-- Keep it readable — no over-engineering for a first version
+- Clean, readable Python with clear parameter definitions and defaults
+- Signal logic separated from execution logic
+- Position sizing with configurable method (equal-weight, vol-scaled, or signal-weighted)
+- Risk checks built in (max position size, exposure limits, stop-loss levels)
+- Use standard libraries (numpy, pandas) for calculations
+- Keep it simple — no over-engineering for a first version; fewer parameters = less overfitting
 
 ### 3. Explain the Logic
 

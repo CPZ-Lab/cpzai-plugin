@@ -132,6 +132,14 @@ CPZAI integrates with multiple data providers:
 - **CoinGecko** — cryptocurrency data
 - **SEC EDGAR** — filings, 13F institutional holdings
 
-### CPZAI MCP Tool
+## CPZAI Tool Chaining for Market Analysis
 
-- `get_market_data` — fetch real-time quotes (price, bid/ask, volume) for any symbol
+When ~~cpzai is connected, execute this workflow:
+
+1. **`get_market_data`** — fetch real-time quotes (price, bid/ask, volume) for target symbols
+2. **`list_positions`** — check if any scanned symbols are already in the portfolio
+3. **`compute_risk`** — understand current portfolio context before evaluating new opportunities
+4. **Synthesize:** apply technical indicator analysis from this skill to the price data. Compare volume to historical averages, assess spread quality, note any data quality issues.
+
+**For multi-symbol scans:**
+Call `get_market_data` with a batch of symbols (e.g. sector constituents). Sort by the most relevant metric (volume surge, price change, spread). Highlight standouts and cross-reference with portfolio exposure from `list_positions`.
