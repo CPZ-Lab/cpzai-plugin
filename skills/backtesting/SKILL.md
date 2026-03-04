@@ -154,6 +154,51 @@ Resample trades with replacement to estimate confidence intervals around key met
 - Assume 20-50 bps round-trip for small-cap or less liquid names
 - If your strategy's gross Sharpe drops below 1.0 after costs, reconsider
 
+## Production Monitoring and Model Governance
+
+### Live Performance Tracking
+
+Once a strategy is deployed, continuously compare live performance to backtest expectations:
+
+| Metric | Backtest | Live | Ratio |
+|--------|----------|------|-------|
+| Sharpe | ... | ... | Live/BT |
+| Max drawdown | ... | ... | ... |
+| Win rate | ... | ... | ... |
+| Avg trade P&L | ... | ... | ... |
+| Turnover | ... | ... | ... |
+
+**Acceptable degradation:** live Sharpe = 50-80% of backtest Sharpe is normal. Below 50% warrants investigation. Below 0 for 3+ months → pause and review.
+
+### Automated Monitoring Alerts
+
+Set alerts for:
+- **IC degradation:** trailing 30-day IC drops below 0 for 5+ consecutive days
+- **Drawdown breach:** live drawdown exceeds 1.5x backtest max drawdown
+- **Turnover spike:** turnover exceeds 2x expected (signal may be oscillating)
+- **Tracking error:** live returns diverge from paper/backtest by more than expected
+- **Regime change:** correlation between strategy and market shifts significantly
+
+### Model Review Cadence
+
+| Frequency | Review |
+|-----------|--------|
+| Daily | P&L, fills, slippage, errors |
+| Weekly | IC, risk metrics, exposure drift |
+| Monthly | Performance vs benchmark, attribution, factor exposures |
+| Quarterly | Full model review — is the thesis still valid? Parameter stability? |
+| Annually | Deep review — competitive landscape, capacity, signal decay |
+
+### When to Decommission a Strategy
+
+1. Live Sharpe < 0.3 for 6+ months (after accounting for market regime)
+2. The economic thesis is no longer valid (regulatory change, structural shift)
+3. Signal IC has been persistently near zero for 3+ months
+4. Capacity has been reached and impact is eating all alpha
+5. A strictly better replacement strategy has been validated
+
+Document the reason for decommission. Dead strategies are valuable post-mortems.
+
 ## CPZAI Tool Chaining for Backtesting
 
 When ~~cpzai is connected, execute this workflow:

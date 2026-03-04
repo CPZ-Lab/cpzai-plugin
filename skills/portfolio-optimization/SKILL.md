@@ -64,6 +64,58 @@ Produces more stable, diversified portfolios.
 **Regularization:**
 Add a penalty term for weight magnitude: `minimize w'Σw + λ||w||₂²`. Prevents extreme concentrations.
 
+## Covariance Estimation
+
+The covariance matrix is the most important input to any portfolio optimizer. Estimation quality directly determines portfolio quality.
+
+### Sample Covariance (Baseline)
+
+```
+S = (1/(T-1)) × X' X
+```
+
+Where X is the T×N matrix of demeaned returns. Requires T > N to be invertible. For 500 stocks with 2 years of daily data (T=504), the matrix is barely estimable and very noisy.
+
+### Exponentially-Weighted Covariance
+
+Weight recent observations more heavily:
+
+```
+S_t = λ S_{t-1} + (1-λ) r_t r_t'
+```
+
+Typical λ = 0.94 (RiskMetrics convention) for daily data. Adapts faster to regime changes than equal-weight, but noisier.
+
+### Factor-Based Covariance
+
+Decompose covariance through a factor model:
+
+```
+Σ = B F B' + D
+```
+
+Where B = N×K factor loading matrix, F = K×K factor covariance, D = N×N diagonal specific variance.
+
+**Advantages:**
+- Requires estimating K(K+1)/2 + 2N parameters instead of N(N+1)/2
+- For 500 stocks with 10 factors: ~5,500 parameters vs ~125,000
+- More stable, better conditioned, fewer estimation errors
+
+**Construction:**
+1. Define factors (statistical via PCA, or fundamental)
+2. Regress each asset's returns on factor returns to get B
+3. Estimate F from factor return history
+4. D = diagonal of residual variances
+
+### Handling Near-Singular Matrices
+
+When N ≈ T or N > T, the sample covariance is singular or near-singular. Solutions:
+- **Shrinkage** (Ledoit-Wolf): always the first thing to try
+- **Factor model**: reduces dimensionality
+- **PCA truncation**: keep top K principal components, zero out the rest
+- **Add small diagonal**: Σ_reg = Σ + εI (Tikhonov regularization)
+- **Use HRP**: avoids matrix inversion entirely
+
 ## Black-Litterman Model
 
 Combines market equilibrium (what the market implies) with investor views (what you believe).

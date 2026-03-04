@@ -25,6 +25,51 @@ If α is statistically significant and survives transaction costs, you have a tr
 
 Typical half-life: 1-5 years for fundamental signals, months for technical signals, minutes to hours for microstructure signals.
 
+## The Return Forecasting Problem
+
+Forecasting expected returns is the hardest problem in quantitative investing. Sharpe ratios of individual stock returns are typically 0.01-0.05 on a daily basis — signal is dwarfed by noise.
+
+### Why It's So Hard
+
+- **Low signal-to-noise:** daily stock returns have a standard deviation of ~1-2% and a mean of ~0.03%. The signal is 1/50th of the noise.
+- **Non-stationarity:** the relationship between predictors and returns changes over time. A model fit to 2015-2020 may not work in 2021+.
+- **Adversarial:** other participants observe and trade on the same signals, eroding their predictive power.
+- **Finite capacity:** even genuine signals can only support limited capital before market impact overwhelms the edge.
+
+### Practical Approaches to Return Estimation
+
+**Don't forecast returns directly:** Instead, forecast the cross-sectional ranking (which stocks will outperform). It's much easier to rank 500 stocks than to predict each one's return.
+
+**Shrink toward equilibrium:** The Black-Litterman approach. Start with the market's implied returns and make small adjustments. Dramatically more stable than bottom-up forecasts.
+
+**Combine many weak signals:** No single predictor is reliable. Combine 5-20 orthogonal signals to build a composite forecast with higher IC.
+
+**Focus on risk, not return:** Portfolio optimization is more sensitive to covariance estimation than return estimation. Spend more effort on the covariance matrix and use simple return forecasts (or none — use HRP).
+
+## The Fundamental Law of Active Management
+
+The most important equation in quantitative investing:
+
+```
+IR ≈ IC × √BR
+```
+
+Where:
+- **IR** = Information Ratio (risk-adjusted active return)
+- **IC** = Information Coefficient (skill per forecast)
+- **BR** = Breadth (number of independent bets per year)
+
+**Implications:**
+- A small IC (0.03) can produce a good IR if breadth is high (500 stocks daily = BR of ~125,000 per year)
+- A high IC (0.10) with low breadth (10 bets per year) produces a mediocre IR
+- This is why systematic strategies that trade many instruments frequently outperform concentrated stock picking on a risk-adjusted basis — even with much weaker per-stock skill
+
+**Extended Fundamental Law (with transfer coefficient):**
+```
+IR ≈ TC × IC × √BR
+```
+Where TC = transfer coefficient (0-1), measuring how much of your signal actually reaches the portfolio. Constraints (long-only, sector limits, turnover limits) reduce TC below 1.
+
 ## Information Coefficient (IC)
 
 The core metric for evaluating predictive signals.

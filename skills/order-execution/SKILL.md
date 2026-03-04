@@ -77,10 +77,87 @@ After each trade, evaluate:
 
 ### Implementation Shortfall
 
-The total cost of implementing a trading decision, including:
-1. Delay cost (market moved while waiting)
-2. Market impact (your order moved the price)
-3. Opportunity cost (unfilled orders that would have been profitable)
+The total cost of implementing a trading decision, decomposed into:
+
+```
+IS = Delay Cost + Trading Cost + Opportunity Cost
+
+Delay Cost     = (Arrival Price - Decision Price) × Shares Executed
+Trading Cost   = (Execution Price - Arrival Price) × Shares Executed
+Opportunity    = (Close Price - Decision Price) × Shares NOT Executed
+```
+
+Track IS over time to evaluate execution quality. Compare to benchmarks (VWAP, arrival price) and across brokers.
+
+## Market Impact Models
+
+### Square-Root Law
+
+The most widely used market impact model. Temporary impact scales with the square root of trade size relative to volume:
+
+```
+Impact (bps) = σ_daily × η × √(Q / ADV)
+```
+
+Where Q = shares traded, ADV = average daily volume, η = market impact coefficient (typically 0.1-0.5 depending on the market), σ_daily = daily volatility in bps.
+
+**Implication:** doubling your order size increases impact by ~40%, not 100%. But impact still grows — large orders in illiquid names are expensive.
+
+### Almgren-Chriss Framework
+
+Optimal execution that minimizes the sum of market impact and timing risk:
+
+- **Trade too fast:** high market impact (you push the price against yourself)
+- **Trade too slow:** high timing risk (the market moves while you wait)
+- **Optimal:** balance the two based on risk aversion
+
+The solution is a trajectory — how many shares to trade at each interval. For a risk-neutral trader, this is a constant rate (TWAP). For risk-averse traders, front-load the execution.
+
+### Permanent vs Temporary Impact
+
+- **Temporary impact:** price displacement that reverts after your order finishes. Caused by liquidity consumption.
+- **Permanent impact:** price shift that persists. Caused by information leakage (the market learns from your trading).
+- Total cost = temporary + permanent. For small retail orders, both are negligible. For institutional size, they dominate.
+
+## Execution Algorithms
+
+### TWAP (Time-Weighted Average Price)
+
+Split the order evenly across time intervals. Simple, predictable, minimizes information leakage.
+
+**When to use:** no urgency, low market impact tolerance, desire for predictable execution.
+
+### VWAP (Volume-Weighted Average Price)
+
+Trade proportionally to historical volume profile. More shares during high-volume periods (typically open and close), fewer during midday.
+
+**When to use:** want to match the market's natural rhythm, benchmark is VWAP.
+
+### Implementation Shortfall (IS) Algo
+
+Front-loads execution to minimize risk of adverse price movement. Trades more aggressively early, tapers off.
+
+**When to use:** time-sensitive signals where alpha decays quickly, willing to accept more market impact for reduced timing risk.
+
+### Participation / POV (Percentage of Volume)
+
+Trade at a fixed percentage of real-time volume (e.g. 10% of volume). Adapts to market conditions automatically.
+
+**When to use:** want to be invisible in the order flow, limit market impact, no urgency.
+
+### Pre-Trade Cost Estimation
+
+Before executing, estimate expected cost:
+
+| Component | Estimate |
+|-----------|----------|
+| Half-spread | bid-ask / 2 |
+| Market impact | σ × η × √(Q/ADV) |
+| Timing risk | σ × √(T) × α |
+| Commission | broker fee schedule |
+| **Total expected cost** | **sum of above** |
+
+If total expected cost exceeds the signal's expected alpha, the trade is negative expected value — do not execute.
 
 ## Paper vs Live Trading
 

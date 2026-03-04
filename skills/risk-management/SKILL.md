@@ -82,6 +82,81 @@ Sensitivity of portfolio returns to the market: `β = Cov(R_p, R_m) / Var(R_m)`
 - β = 0: market-neutral
 - β < 0: inverse to market (rare for long portfolios)
 
+## Factor Risk Models
+
+Decompose portfolio risk into systematic (factor) and idiosyncratic (specific) components.
+
+### Systematic vs Specific Risk
+
+```
+Total Risk² = Systematic Risk² + Specific Risk²
+σ²_portfolio = w' B F B' w + w' D w
+```
+
+Where B = factor exposure matrix, F = factor covariance matrix, D = diagonal matrix of specific variances.
+
+**Systematic risk** comes from exposure to common factors (market, sector, style). It's diversifiable across strategies but not within a single factor exposure.
+
+**Specific risk** is unique to each security. It diversifies away with more positions. A well-diversified portfolio of 50+ stocks has specific risk that is small relative to factor risk.
+
+### Common Factor Taxonomies
+
+**Statistical factors (PCA-based):**
+Extract principal components from the return covariance matrix. Factors are purely statistical — no economic interpretation. PC1 is usually the market, PC2 often captures a size or sector rotation.
+
+**Fundamental factors:**
+- Market (beta)
+- Size (log market cap)
+- Value (book-to-price, earnings yield)
+- Momentum (12-1 month return)
+- Volatility (realized vol)
+- Quality (ROE, leverage, earnings stability)
+- Growth (revenue growth, earnings growth)
+- Liquidity (turnover, bid-ask spread)
+- Sector (GICS classification dummies)
+
+**Factor exposure estimation:**
+Cross-sectional regression at each time period:
+```
+R_i,t = Σ_k β_i,k × f_k,t + ε_i,t
+```
+Where β_i,k = asset i's exposure to factor k, f_k,t = factor return at time t.
+
+### Risk Budgeting
+
+Allocate risk (not capital) across factors or strategies.
+
+**Marginal contribution to risk (MCTR):**
+```
+MCTR_i = w_i × (Σw)_i / σ_portfolio
+```
+
+The change in portfolio risk from a small increase in position i. Useful for identifying which positions are driving total risk.
+
+**Component risk:**
+```
+CR_i = w_i × MCTR_i
+Σ CR_i = σ²_portfolio
+```
+
+Each position's share of total portfolio variance. If one position contributes 40% of risk but only 10% of weight, it's dominating the portfolio's risk profile.
+
+**Risk budget target:** set desired risk contribution per position/factor/strategy, then optimize weights to match the budget.
+
+### Liquidity Risk
+
+Risk that positions cannot be exited at expected prices, especially during stress.
+
+**Liquidity metrics:**
+- **Days to liquidate:** Position value / (ADV × participation rate). Participation rate = 10-20% of volume is typical.
+- **Liquidation cost:** estimated slippage if the full position is sold. Increases non-linearly with position size.
+- **Liquidity-adjusted VaR:** standard VaR + liquidation cost. More realistic for less liquid portfolios.
+
+**Liquidity rules of thumb:**
+- No single position should be more than 1 day's ADV
+- Total portfolio should be liquidatable in 3-5 trading days at <2% cost
+- During crises, assume ADV drops 50-70%
+
 ## Position-Level Risk Controls
 
 ### Position Size Limits

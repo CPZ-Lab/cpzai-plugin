@@ -78,6 +78,54 @@ Market-neutral strategies that exploit statistical mispricings across many instr
 - Event-driven: systematic response to earnings, splits, index changes
 - Cross-asset: exploit lead-lag relationships between related instruments
 
+### Multi-Asset / Cross-Asset
+
+Strategies that trade across asset classes (equities, bonds, commodities, currencies).
+
+**Approaches:**
+- Risk parity across asset classes (equalize risk contribution from each)
+- Carry strategies (harvest yield differentials — bond carry, FX carry, dividend yield)
+- Trend following across futures (managed futures / CTA style)
+- Macro factor timing (overweight equities when yield curve steep, credit spreads tight)
+
+**Cross-asset considerations:**
+- Different trading hours and settlement conventions
+- Currency hedging for international positions
+- Varying liquidity profiles across asset classes
+- Correlation instability between asset classes (equity-bond correlation can flip sign)
+
+## Capacity and Crowding
+
+### Estimating Strategy Capacity
+
+**Capacity** is the maximum AUM a strategy can manage before market impact erodes returns to zero.
+
+```
+Capacity ≈ (Gross Alpha - Fixed Costs) / (Impact Coefficient × Turnover)
+```
+
+**Rules of thumb:**
+- High-frequency strategies: $10M-$100M capacity
+- Daily systematic equity (500-stock universe): $100M-$1B
+- Monthly factor strategies (large-cap): $1B-$10B+
+- Lower liquidity = lower capacity
+
+### Measuring Crowding
+
+Crowding occurs when many participants hold the same positions, creating correlated exit risk.
+
+**Crowding indicators:**
+- **Short interest concentration:** many funds short the same names
+- **13F overlap:** high ownership overlap across hedge funds
+- **Factor valuation:** when value spreads compress, the value factor is crowded
+- **Momentum crash risk:** when momentum portfolios have extreme sector or factor tilts
+- **Correlation of returns among similar strategies:** rising correlation = rising crowding
+
+**Impact of crowding:**
+- Reduces forward alpha (the edge is shared among more participants)
+- Increases tail risk (when crowded positions unwind, they unwind together)
+- Creates gap risk (liquidity disappears when everyone wants to exit simultaneously)
+
 ## Signal Design Principles
 
 1. **Economic rationale** — Every signal should have a plausible reason to work. Pure data-mined patterns are fragile.
