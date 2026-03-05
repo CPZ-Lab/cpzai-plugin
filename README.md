@@ -6,7 +6,7 @@
 
 # CPZAI — Systematic Trading Plugin
 
-**AI-Native Quantitative Trading for Claude**
+**AI-Native Systematic and Quantitative Trading for Claude**
 
 [![Claude Cowork](https://img.shields.io/badge/Claude-Cowork-000000?logo=anthropic&logoColor=white)](https://claude.com/product/cowork)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-000000?logo=anthropic&logoColor=white)](https://claude.com/product/claude-code)
