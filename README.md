@@ -12,7 +12,7 @@
 [![Claude Code](https://img.shields.io/badge/Claude-Code-000000?logo=anthropic&logoColor=white)](https://claude.com/product/claude-code)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue)](LICENSE)
 [![Skills](https://img.shields.io/badge/Skills-9-green)]()
-[![Commands](https://img.shields.io/badge/Commands-5-green)]()
+[![Commands](https://img.shields.io/badge/Commands-17-green)]()
 [![MCP Tools](https://img.shields.io/badge/MCP_Tools-18-green)]()
 
 </div>
@@ -51,11 +51,23 @@ claude plugin install cpzai@cpzai-plugin
 
 | Command | Description |
 |---------|-------------|
-| `/cpzai:strategy-builder` | Guided strategy creation — describe a trading idea and Claude writes the code, creates the strategy on the platform |
-| `/cpzai:risk-report` | Generate a risk report — VaR, Sharpe, drawdown, correlation, with actionable recommendations |
+| `/cpzai:strategy-builder` | Guided strategy creation — describe a trading idea and Claude writes the code |
 | `/cpzai:backtest` | Run a strategy backtest, analyze metrics, and identify improvements |
-| `/cpzai:market-scan` | Scan sectors or themes with real-time quotes and technical/fundamental context |
-| `/cpzai:portfolio-review` | Full portfolio health check — positions, diversification, performance attribution |
+| `/cpzai:risk-report` | Generate a risk report — VaR, Sharpe, drawdown, with recommendations |
+| `/cpzai:portfolio-review` | Full portfolio health check — positions, diversification, attribution |
+| `/cpzai:market-scan` | Scan sectors or themes with real-time quotes and context |
+| `/cpzai:trade` | Place a trade — buy or sell through your connected broker |
+| `/cpzai:trade-idea` | Generate a structured trade idea with entry, exit, sizing, and risk |
+| `/cpzai:optimize` | Optimize portfolio allocation — mean-variance, Black-Litterman, risk parity, HRP |
+| `/cpzai:options-analysis` | Analyze options strategies, Greeks, and vol surface for a ticker |
+| `/cpzai:equity-research` | Generate a comprehensive equity research report |
+| `/cpzai:earnings-preview` | Preview upcoming earnings — expectations, patterns, and positioning |
+| `/cpzai:factor-screen` | Screen stocks by quantitative factors — value, momentum, quality, etc. |
+| `/cpzai:price` | Get real-time quotes — price, change, volume, bid/ask |
+| `/cpzai:positions` | View current portfolio positions — holdings, P&L, weights |
+| `/cpzai:orders` | View recent orders — open, filled, cancelled, with fill details |
+| `/cpzai:strategies` | List, view, and manage your trading strategies |
+| `/cpzai:sync` | Sync your portfolio from all connected brokers |
 
 ## Skills
 
