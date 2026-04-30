@@ -1,6 +1,9 @@
 ---
 description: Sync your portfolio — pull latest positions, balances, and orders from all connected brokers
-argument-hint: ""
+allowed-tools:
+  - mcp__cpzai__sync_portfolio
+  - mcp__cpzai__list_accounts
+  - mcp__cpzai__list_positions
 ---
 
 # Sync

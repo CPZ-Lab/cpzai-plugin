@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "mcp__cpzai__place_order|mcp__cpzai__execute_strategy|mcp__cpzai__delete_webhook",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-trade-guard.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "mcp__cpzai__place_order|mcp__cpzai__execute_strategy|mcp__cpzai__create_strategy|mcp__cpzai__update_strategy|mcp__cpzai__sync_portfolio|mcp__cpzai__create_webhook|mcp__cpzai__delete_webhook",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/audit-log.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

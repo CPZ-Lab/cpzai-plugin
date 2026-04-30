@@ -1,6 +1,8 @@
 ---
 description: Get real-time quotes — price, change, volume, bid/ask — for one or more symbols
-argument-hint: " <symbols>"
+argument-hint: "<symbols>"
+allowed-tools:
+  - mcp__cpzai__get_market_data
 ---
 
 # Price

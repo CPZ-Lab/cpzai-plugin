@@ -1,13 +1,20 @@
 {
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "cpzai-plugin",
   "owner": {
-    "name": "CPZ Lab"
+    "name": "CPZ Lab",
+    "url": "https://www.cpz-lab.com/"
+  },
+  "metadata": {
+    "description": "Official CPZAI plugin marketplace for Claude Code and Cowork — systematic and quantitative trading."
   },
   "plugins": [
     {
-      "name": "CPZAI",
+      "name": "cpzai",
+      "description": "AI-native systematic trading — build strategies, backtest, manage risk, and execute trades. Connects to CPZAI for live portfolio, market data, and order management.",
+      "category": "productivity",
       "source": "./cpzai",
-      "description": "AI-native systematic trading — build strategies, backtest, manage risk, and execute trades. Connects to CPZAI for live portfolio, market data, and order management."
+      "homepage": "https://ai.cpz-lab.com"
     }
   ]
 }

@@ -1,6 +1,9 @@
 ---
 description: Scan markets by sector, theme, or custom criteria with real-time data
-argument-hint: " <sector | theme | symbols>"
+argument-hint: "<sector | theme | symbols>"
+allowed-tools:
+  - mcp__cpzai__get_market_data
+  - mcp__cpzai__list_positions
 ---
 
 # Market Scan

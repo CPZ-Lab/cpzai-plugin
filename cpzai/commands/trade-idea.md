@@ -1,6 +1,11 @@
 ---
 description: Generate a structured trade idea with entry, exit, sizing, and risk management — based on your portfolio context
-argument-hint: " <ticker | theme | setup>"
+argument-hint: "<ticker | theme | setup>"
+allowed-tools:
+  - mcp__cpzai__list_positions
+  - mcp__cpzai__list_accounts
+  - mcp__cpzai__get_market_data
+  - mcp__cpzai__compute_risk
 ---
 
 # Trade Idea

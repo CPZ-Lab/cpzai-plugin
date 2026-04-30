@@ -1,6 +1,10 @@
 ---
 description: Analyze options strategies, Greeks, volatility surface, and derivatives positioning for a ticker
-argument-hint: " <ticker> [strategy type]"
+argument-hint: "<ticker> [strategy type]"
+allowed-tools:
+  - mcp__cpzai__get_market_data
+  - mcp__cpzai__list_positions
+  - mcp__cpzai__compute_risk
 ---
 
 # Options Analysis

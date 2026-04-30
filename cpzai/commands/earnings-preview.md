@@ -1,6 +1,11 @@
 ---
 description: Preview upcoming earnings — expectations, key metrics to watch, historical patterns, and positioning ideas
-argument-hint: " <ticker | watchlist | portfolio>"
+argument-hint: "<ticker | watchlist | portfolio>"
+allowed-tools:
+  - mcp__cpzai__get_market_data
+  - mcp__cpzai__list_positions
+  - WebSearch
+  - WebFetch
 ---
 
 # Earnings Preview

@@ -1,6 +1,12 @@
 ---
 description: Run a strategy backtest, analyze performance metrics, and suggest improvements
-argument-hint: " <strategy> [date range] [parameters]"
+argument-hint: "<strategy> [date range] [parameters]"
+allowed-tools:
+  - mcp__cpzai__list_strategies
+  - mcp__cpzai__get_strategy
+  - mcp__cpzai__update_strategy
+  - mcp__cpzai__execute_strategy
+  - mcp__cpzai__get_backtest_results
 ---
 
 # Backtest

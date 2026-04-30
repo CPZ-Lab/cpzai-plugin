@@ -1,6 +1,12 @@
 ---
 description: Build a trading strategy from a natural language idea — generates Python code and creates it on the platform
-argument-hint: " <strategy description>"
+argument-hint: "<strategy description>"
+allowed-tools:
+  - mcp__cpzai__list_strategies
+  - mcp__cpzai__get_strategy
+  - mcp__cpzai__create_strategy
+  - mcp__cpzai__update_strategy
+  - mcp__cpzai__get_market_data
 ---
 
 # Strategy Builder

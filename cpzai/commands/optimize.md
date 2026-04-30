@@ -1,6 +1,12 @@
 ---
 description: Optimize portfolio allocation using quantitative methods — mean-variance, Black-Litterman, risk parity, or HRP
-argument-hint: " [method] [constraints]"
+argument-hint: "[method] [constraints]"
+allowed-tools:
+  - mcp__cpzai__list_positions
+  - mcp__cpzai__list_accounts
+  - mcp__cpzai__get_market_data
+  - mcp__cpzai__compute_risk
+  - mcp__cpzai__list_risk_snapshots
 ---
 
 # Optimize

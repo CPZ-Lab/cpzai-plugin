@@ -1,0 +1,37 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  structure:
+    name: Structure validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate plugin structure
+        run: python3 tests/validate.py
+
+  smoke-mcp:
+    name: Live MCP smoke test
+    runs-on: ubuntu-latest
+    needs: structure
+    # Only run smoke test on push to main and manual dispatch — avoids hitting
+    # the live endpoint on every PR from forks.
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Smoke test live MCP server
+        run: bash tests/smoke-mcp.sh
+        env:
+          ROOT: ${{ github.workspace }}

@@ -1,6 +1,12 @@
 ---
 description: Generate a comprehensive risk report for your portfolio or a specific strategy
-argument-hint: " [portfolio | strategy <name>]"
+argument-hint: "[portfolio | strategy <name>]"
+allowed-tools:
+  - mcp__cpzai__list_positions
+  - mcp__cpzai__list_accounts
+  - mcp__cpzai__get_market_data
+  - mcp__cpzai__compute_risk
+  - mcp__cpzai__list_risk_snapshots
 ---
 
 # Risk Report

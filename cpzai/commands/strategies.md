@@ -1,6 +1,11 @@
 ---
 description: List, view, and manage your trading strategies — status, last backtest, and quick actions
-argument-hint: " [strategy name | list | status]"
+argument-hint: "[strategy name | list | status]"
+allowed-tools:
+  - mcp__cpzai__list_strategies
+  - mcp__cpzai__get_strategy
+  - mcp__cpzai__get_backtest_results
+  - mcp__cpzai__update_strategy
 ---
 
 # Strategies

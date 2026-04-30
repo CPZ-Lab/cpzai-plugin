@@ -1,6 +1,12 @@
 ---
 description: Full portfolio health check — positions, performance, diversification, and actionable insights
-argument-hint: ""
+allowed-tools:
+  - mcp__cpzai__list_positions
+  - mcp__cpzai__list_accounts
+  - mcp__cpzai__get_market_data
+  - mcp__cpzai__compute_risk
+  - mcp__cpzai__list_orders
+  - mcp__cpzai__list_risk_snapshots
 ---
 
 # Portfolio Review

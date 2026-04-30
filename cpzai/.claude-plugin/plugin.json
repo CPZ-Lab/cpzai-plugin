@@ -1,8 +1,57 @@
 {
-  "name": "CPZAI",
-  "version": "1.0.0",
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "cpzai",
+  "version": "2.0.0",
   "description": "AI-native systematic trading — build strategies, backtest, manage risk, and execute trades. Connects to CPZAI for live portfolio, market data, and order management.",
   "author": {
-    "name": "CPZ Lab"
+    "name": "CPZ Lab",
+    "url": "https://www.cpz-lab.com/"
+  },
+  "homepage": "https://ai.cpz-lab.com",
+  "repository": "https://github.com/CPZ-Lab/cpzai-plugin",
+  "license": "Apache-2.0",
+  "keywords": [
+    "trading",
+    "investing",
+    "systematic",
+    "quantitative",
+    "backtesting",
+    "portfolio",
+    "risk",
+    "options",
+    "alpaca",
+    "ibkr",
+    "cpzai",
+    "mcp"
+  ],
+  "userConfig": {
+    "cpz_api_key": {
+      "type": "string",
+      "title": "CPZ API Key",
+      "description": "Your CPZAI API key. Generate one at https://ai.cpz-lab.com → Settings → API Keys. Leave blank to authenticate via OAuth instead.",
+      "sensitive": true,
+      "required": false
+    },
+    "cpz_api_secret": {
+      "type": "string",
+      "title": "CPZ API Secret",
+      "description": "Your CPZAI API secret (paired with the key above). Stored in your system keychain. Leave blank to use OAuth.",
+      "sensitive": true,
+      "required": false
+    },
+    "default_environment": {
+      "type": "string",
+      "title": "Default Trading Environment",
+      "description": "Default broker environment for new orders. Set to 'paper' to require explicit override before any live trade.",
+      "default": "paper",
+      "required": false
+    },
+    "require_trade_confirmation": {
+      "type": "boolean",
+      "title": "Require trade confirmation",
+      "description": "When true, every place_order and execute_strategy call prompts for explicit user confirmation. Recommended.",
+      "default": true,
+      "required": false
+    }
   }
 }

@@ -1,6 +1,9 @@
 ---
 description: View your current portfolio positions — holdings, P&L, weights, and today's movers
-argument-hint: ""
+allowed-tools:
+  - mcp__cpzai__list_positions
+  - mcp__cpzai__list_accounts
+  - mcp__cpzai__get_market_data
 ---
 
 # Positions

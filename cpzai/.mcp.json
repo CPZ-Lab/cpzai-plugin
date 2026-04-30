@@ -2,7 +2,12 @@
   "mcpServers": {
     "cpzai": {
       "type": "http",
-      "url": "https://mcp.cpz-lab.com/mcp"
+      "url": "https://mcp.cpz-lab.com/mcp",
+      "headers": {
+        "X-CPZ-Key": "${user_config.cpz_api_key}",
+        "X-CPZ-Secret": "${user_config.cpz_api_secret}",
+        "X-CPZ-Client": "claude-plugin/2.0.0"
+      }
     }
   }
 }

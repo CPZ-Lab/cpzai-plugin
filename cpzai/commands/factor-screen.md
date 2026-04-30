@@ -1,6 +1,9 @@
 ---
 description: Screen stocks by quantitative factors — value, momentum, quality, volatility, size, and custom signals
-argument-hint: " <factor | theme> [universe]"
+argument-hint: "<factor | theme> [universe]"
+allowed-tools:
+  - mcp__cpzai__get_market_data
+  - mcp__cpzai__list_positions
 ---
 
 # Factor Screen

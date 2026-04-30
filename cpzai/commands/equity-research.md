@@ -1,6 +1,10 @@
 ---
 description: Generate a comprehensive equity research report on any publicly traded company
-argument-hint: " <ticker | company name>"
+argument-hint: "<ticker | company name>"
+allowed-tools:
+  - mcp__cpzai__get_market_data
+  - WebSearch
+  - WebFetch
 ---
 
 # Equity Research

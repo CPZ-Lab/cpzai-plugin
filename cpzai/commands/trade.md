@@ -1,6 +1,13 @@
 ---
 description: Place a trade — buy or sell stocks, ETFs, or crypto through your connected broker
-argument-hint: " <buy|sell> <quantity> <symbol> [order type] [limit price]"
+argument-hint: "<buy|sell> <quantity> <symbol> [order type] [limit price]"
+allowed-tools:
+  - mcp__cpzai__list_accounts
+  - mcp__cpzai__list_positions
+  - mcp__cpzai__get_market_data
+  - mcp__cpzai__place_order
+  - mcp__cpzai__list_orders
+  - AskUserQuestion
 ---
 
 # Trade

@@ -1,6 +1,9 @@
 ---
 description: View recent orders — open, filled, cancelled — with status and fill details
-argument-hint: " [status] [symbol]"
+argument-hint: "[status] [symbol]"
+allowed-tools:
+  - mcp__cpzai__list_orders
+  - mcp__cpzai__list_accounts
 ---
 
 # Orders
