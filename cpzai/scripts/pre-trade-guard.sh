@@ -50,4 +50,12 @@ JSON
   exit 0
 fi
 
+# Mutating strategy/webhook/connection/portfolio tools also require confirmation
+if [ "$TOOL" = "mcp__cpzai__create_strategy" ] || [ "$TOOL" = "mcp__cpzai__update_strategy" ] || [ "$TOOL" = "mcp__cpzai__create_webhook" ] || [ "$TOOL" = "mcp__cpzai__sync_portfolio" ] || [ "$TOOL" = "mcp__cpzai__create_connection" ]; then
+  cat <<JSON
+{"decision":"block","reason":"CPZAI safety guard: tool=${TOOL} env=${ENV}. This is a mutating tool. Summarize what will change and obtain explicit confirmation via AskUserQuestion before re-issuing. Set require_trade_confirmation=false to opt out."}
+JSON
+  exit 0
+fi
+
 exit 0
