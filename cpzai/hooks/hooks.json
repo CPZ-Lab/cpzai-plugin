@@ -16,7 +16,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre_trade_guard.py"
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre_trade_guard.py",
+            "onFailure": "block"
           }
         ]
       }

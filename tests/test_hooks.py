@@ -155,8 +155,29 @@ class SessionBanner(unittest.TestCase):
             for tool in ("tr", "cat"):
                 os.symlink(shutil.which(tool), os.path.join(d, tool))
             out = self.banner(path=d)
-        self.assertIn("guard=OFF (python3 not found", out)
+        self.assertIn("guard=OFF (no working python3", out)
         self.assertIn("confirm=false", out)
+
+    # Re-review of plugin #1: the /usr/bin/python3 stub on a Mac without the developer
+    # tools passes `command -v` but cannot run anything; the banner said guard=on.
+    def test_says_when_python3_exists_but_does_not_run(self):
+        with tempfile.TemporaryDirectory() as d:
+            for tool in ("tr", "cat"):
+                os.symlink(shutil.which(tool), os.path.join(d, tool))
+            stub = os.path.join(d, "python3")
+            with open(stub, "w") as f:
+                f.write("#!/bin/sh\necho 'xcode-select: note: No developer tools were found' >&2\nexit 1\n")
+            os.chmod(stub, 0o755)
+            out = self.banner(path=d)
+        self.assertIn("guard=OFF (no working python3", out)
+        self.assertIn("confirm=false", out)
+
+
+class GuardFailure(unittest.TestCase):
+    def test_a_guard_that_cannot_run_blocks_the_call(self):
+        entry = HOOKS["hooks"]["PreToolUse"][0]["hooks"][0]
+        self.assertTrue(entry["command"].endswith("pre_trade_guard.py"))
+        self.assertEqual(entry.get("onFailure"), "block")
 
 
 class AuditLog(unittest.TestCase):

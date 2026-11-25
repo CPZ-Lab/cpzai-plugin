@@ -14,11 +14,14 @@ case "$RAW_CONFIRM" in
   false|0|no|off) CONFIRM="false" ;;
   *) CONFIRM="true" ;;
 esac
-# The guard and the audit log are Python: without python3 neither runs, and the banner says so.
-if command -v python3 >/dev/null 2>&1; then
+# The guard and the audit log are Python. `command -v` is not enough: a Mac without the
+# developer tools has a /usr/bin/python3 stub that exists but cannot run a script. So
+# python3 is run, and only one that answers counts. Without it the guard cannot start;
+# hooks.json has it block (onFailure) rather than let an order through, and nothing is logged.
+if command -v python3 >/dev/null 2>&1 && [ "$(python3 -c 'import json, re, sys; print("ok")' 2>/dev/null)" = "ok" ]; then
   GUARD="on"
 else
-  GUARD="OFF (python3 not found: orders are not asked about and nothing is logged)"
+  GUARD="OFF (no working python3: CPZAI orders and strategy runs are blocked and nothing is logged)"
   CONFIRM="false"
 fi
 
