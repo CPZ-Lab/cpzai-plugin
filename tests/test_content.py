@@ -111,5 +111,89 @@ class Unavailable(unittest.TestCase):
         self.assertIn("**Not available from any CPZAI tool:**", text("CONNECTORS.md"))
 
 
+class Formulas(unittest.TestCase):
+    """cpzai#3012, #3022, #3023: formulas and rules the skills give Claude."""
+
+    def test_risk_contributions_add_up_to_100_percent(self):
+        body = text("skills/risk-management/SKILL.md")
+        self.assertIn("MCTR_i = ∂σ_p / ∂w_i = (Σw)_i / σ_p", body)
+        self.assertIn("Σ PCR_i = 100%", body)
+        self.assertNotIn("Σ CR_i = σ²_portfolio", body)
+        self.assertNotIn("MCTR_i = w_i × (Σw)_i / σ_portfolio", body)
+        # Reference: a 4-asset book. The derivative of σ_p equals (Σw)_i/σ_p, and the
+        # percent contributions w_i(Σw)_i/(w'Σw) add up to 1; the old CR_i = w_i²(Σw)_i/σ_p did not add up to σ².
+        vol = [0.30, 0.20, 0.25, 0.05]
+        corr = [[1, .5, .6, 0], [.5, 1, .4, .1], [.6, .4, 1, 0], [0, .1, 0, 1]]
+        cov = [[vol[i] * vol[j] * corr[i][j] for j in range(4)] for i in range(4)]
+        w = [.4, .25, .25, .1]
+        sw = [sum(cov[i][j] * w[j] for j in range(4)) for i in range(4)]
+        var = sum(w[i] * sw[i] for i in range(4))
+        sp = var ** 0.5
+        for i in range(4):
+            h = 1e-7
+            w2 = [w[j] + (h if j == i else 0) for j in range(4)]
+            sp2 = sum(w2[a] * cov[a][b] * w2[b] for a in range(4) for b in range(4)) ** 0.5
+            self.assertAlmostEqual((sp2 - sp) / h, sw[i] / sp, places=5)
+        self.assertAlmostEqual(sum(w[i] * sw[i] / var for i in range(4)), 1.0, places=12)
+        old_cr = [w[i] * (w[i] * sw[i] / sp) for i in range(4)]
+        self.assertNotAlmostEqual(sum(old_cr), var, places=3)
+
+    def test_risk_parity_is_described_as_equal_total_contribution(self):
+        po = text("skills/portfolio-optimization/SKILL.md")
+        self.assertNotIn("each asset's marginal contribution to portfolio volatility is identical", po)
+        self.assertIn("the minimum-variance one", po)
+        self.assertNotIn("`w_i = (1/σ_i) / Σ(1/σ_j)`. Equalizes risk contribution.", text("skills/strategy-development/SKILL.md"))
+
+    def test_six_rules_from_3022(self):
+        self.assertIn("IV(25d call) - IV(25d put)", text("skills/volatility-and-derivatives/SKILL.md"))
+        self.assertNotIn("BR of ~125,000", text("skills/alpha-research/SKILL.md"))
+        po = text("skills/portfolio-optimization/SKILL.md")
+        self.assertIn("5,000 + 55 + 500 = 5,555", po)
+        self.assertIn("scaled identity", po)
+        self.assertNotIn("statistical significance (>30)", text("commands/backtest.md"))
+        self.assertIn("(P_worst × R_worst)", text("commands/trade-idea.md"))
+
+    def test_17a4_retention(self):
+        body = text("skills/compliance-and-recordkeeping/SKILL.md")
+        self.assertNotIn("order records for 6 years", body)
+        self.assertNotIn("6-year order record retention", body)
+        self.assertIn("order memoranda (Rule 17a-3(a)(6)) for 3 years", body)
+
+
+class Orders(unittest.TestCase):
+    """cpzai#3014, #3034: /trade matches place_order's fields and never resends blindly."""
+
+    def test_trade_takes_a_stop_price_and_shares_only(self):
+        body = text("commands/trade.md")
+        self.assertIn("[stop price]", body)
+        self.assertNotIn("`$500` for notional", body)
+        self.assertNotIn("buy $1000 SPY", body)
+        self.assertIn("Stop:       $XXX.XX", body)
+        self.assertIn("`time_in_force: day` only", body)
+        self.assertNotIn("(day, GTC, IOC, FOK)", text("skills/order-execution/SKILL.md"))
+
+    def test_trade_never_resends_after_a_timeout(self):
+        body = text("commands/trade.md")
+        self.assertIn("Do not call `place_order` again", body)
+        self.assertIn("not** guaranteed to be deduplicated", body)
+
+
+class StrategyFormat(unittest.TestCase):
+    """cpzai#3013: /strategy-builder writes the format Strategy Lab backtests."""
+
+    def test_names_symbols_and_the_signal_interface(self):
+        body = text("commands/strategy-builder.md")
+        for part in ("SYMBOLS = [", "def generate_signals(data, state, **kwargs)", "def on_bar(context, data)", "No strategy interface function is available"):
+            self.assertIn(part, body)
+
+
+class Paging(unittest.TestCase):
+    """cpzai#3037: a page of positions or orders is not the whole book."""
+
+    def test_book_commands_page_until_a_short_page(self):
+        for rel in ("commands/positions.md", "commands/portfolio-review.md", "commands/risk-report.md", "commands/orders.md"):
+            self.assertIn("until a page comes back shorter than the limit", text(rel), rel)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

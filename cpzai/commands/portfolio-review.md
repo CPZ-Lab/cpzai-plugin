@@ -34,7 +34,7 @@ No arguments needed — pulls the full portfolio from connected accounts.
 ### 1. Gather Portfolio Data
 
 If ~~cpzai is connected:
-- Call `list_positions` for all open positions
+- Call `list_positions` and keep paging (`offset` += rows returned) until a page comes back shorter than the limit; `count` is the page size, not the total. Read `account_errors`: an account named there was not read, so totals leave it out and say so
 - Call `cash_summary` for equity, cash and buying power per account (last sync; note `stale`)
 - Call `list_accounts` for each account's broker and environment; it holds no balances
 - Call `get_market_data` for current prices on all holdings

@@ -34,7 +34,7 @@ Pull your recent order history and present status, fills, and execution details.
 ### 1. Fetch Orders
 
 If ~~cpzai is connected:
-- Call `list_orders` with any status/symbol filters
+- Call `list_orders` with any status/symbol filters, and keep paging (`offset` += rows returned) until a page comes back shorter than the limit or the orders are older than the period shown; the Last 7 Days counts need every order of the 7 days. Read `account_errors`: orders listed for an account named there are incomplete
 - Call `list_accounts` to identify which broker account(s) are active
 
 If no connection:

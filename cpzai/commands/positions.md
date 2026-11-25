@@ -28,7 +28,7 @@ No arguments needed — pulls all open positions from connected accounts.
 ### 1. Fetch Positions
 
 If ~~cpzai is connected:
-- Call `list_positions` to get all open positions
+- Call `list_positions` and keep paging (`offset` += rows returned) until a page comes back shorter than the limit; `count` is the page size, not the total. Read `account_errors`: an account named there was not read, so totals leave it out and say so
 - Call `cash_summary` for equity and buying power per account (last sync: show `as_of`, and say so when `stale` is true)
 - Call `list_accounts` for each account's broker and environment (paper or live); it holds no balances
 - Call `get_market_data` for current prices on all held symbols

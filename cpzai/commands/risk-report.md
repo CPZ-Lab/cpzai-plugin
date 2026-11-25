@@ -39,7 +39,7 @@ Pull live positions, compute risk metrics, and produce an actionable risk report
 ### 1. Gather Current State
 
 If ~~cpzai is connected:
-- Call `list_positions` to get all open positions with market values
+- Call `list_positions` and keep paging (`offset` += rows returned) until a page comes back shorter than the limit; `count` is the page size, not the total. Read `account_errors`: an account named there was not read, so totals leave it out and say so
 - Call `cash_summary` for equity and buying power per account (last sync; note `stale`)
 - Call `get_market_data` for current prices on all held symbols
 - Call `compute_risk` to get a fresh risk snapshot. Its figures are today's holdings replayed over `return_window`: quote `method_note` with them

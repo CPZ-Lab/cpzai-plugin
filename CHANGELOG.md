@@ -14,6 +14,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Equity, cash and buying power came from `list_accounts`, which holds no balances. Commands, skills and agents now use `cash_summary` (cpzai#2906).
 - Commands and skills asked for figures no tool returns (IV, Greeks, P/E, ROE, sector and factor exposure, week and month P&L, margin used) and pointed history-based figures (52-week range, moving averages, RSI, relative volume, per-holding beta and volatility, covariance) at the quote or the risk check. History now comes from `get_bars`; every command says to write "not available from CPZAI" for the rest, never fill it from memory; CONNECTORS.md lists what each tool returns (cpzai#2886, cpzai#2909).
 
+- The audit log (now `scripts/audit_log.py`) logged a refused order as ok, kept no broker reply, skipped calls that failed outright and cut the input at 240 characters. It now records refusals with their reason, the broker's order id and status, failed calls (PostToolUseFailure), and the whole input with credential fields redacted (cpzai#3024).
+- The risk-management skill's risk contributions had an extra weight and added up to far more than 100%; portfolio-optimization described risk parity with the minimum-variance condition; strategy-development said inverse volatility equalizes risk contribution without the equal-correlation condition (cpzai#3012).
+- Six formulas and rules: risk reversal sign, breadth, factor model parameter count, what scikit-learn's Ledoit-Wolf shrinks toward, the trade count for a meaningful backtest, and /trade-idea's expected value leaving out the worst case (cpzai#3022).
+- SEC Rule 17a-4 retention: order memoranda 3 years, blotters and ledgers 6 (cpzai#3023).
+- `/trade` takes a stop price, takes shares only, says orders are day orders, shows the limit and stop before approval, and never resends after a timeout; order-execution no longer offers GTC, IOC, FOK, extended hours, trailing or bracket orders through `place_order` (cpzai#3014, cpzai#3034).
+- `/strategy-builder` writes the format Strategy Lab backtests: `SYMBOLS` and one module-level `generate_signals`, `generate_signal` or `on_bar` (cpzai#3013).
+- `/positions`, `/portfolio-review`, `/risk-report` and `/orders` page until a short page instead of treating one page as the whole book (cpzai#3037).
+
 ### Added
 - `tests/test_hooks.py` and `tests/test_content.py`, run by `tests/run-all.sh` and CI.
 
