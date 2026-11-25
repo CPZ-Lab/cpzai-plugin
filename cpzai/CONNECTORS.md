@@ -121,15 +121,15 @@ The default environment is a reminder, not an account check: the order input car
 
 To opt out (not recommended): set `userConfig.require_trade_confirmation = false` via the `/plugin` UI.
 
-### 3. PostToolUse audit log
+### 3. Audit log
 
-`cpzai/scripts/audit-log.sh` runs after every state-mutating CPZAI tool call and appends a single-line JSON record to `${CLAUDE_PLUGIN_DATA}/audit.log` (typically `~/.claude/plugins/data/cpzai-cpzai-plugin/audit.log`). Record shape:
+`cpzai/scripts/audit_log.py` runs after every state-changing CPZAI tool call, on `PostToolUse` and on `PostToolUseFailure` (a call that failed outright), and appends one JSON line to `${CLAUDE_PLUGIN_DATA}/audit.log` (typically `~/.claude/plugins/data/cpzai-cpzai-plugin/audit.log`). Record shape:
 
 ```json
-{"ts":"2026-04-30T13:00:13Z","tool":"mcp__plugin_cpzai_cpzai__place_order","ok":true,"input_preview":"{\"symbol\":\"AAPL\",\"quantity\":10,\"side\":\"buy\",\"order_type\":\"market\"}"}
+{"ts":"2026-11-25T13:00:13Z","event":"PostToolUse","tool":"mcp__plugin_cpzai_cpzai__place_order","ok":true,"input":{"account_id":"PA3...","broker_credential_id":"...","symbol":"AAPL","side":"buy","order_type":"limit","quantity":10,"price":200.5},"order_id":"alp-123","status":"accepted"}
 ```
 
-`ok` is false when the tool answered an error, and null when the answer does not say; it is never assumed true. The log persists across plugin updates. Input previews are truncated to 240 characters and never include credentials.
+`ok` is false when the call failed or the tool answered an error or a refusal (with `error` holding the reason), true when it answered without one, and null when the answer says neither; it is never assumed true. `order_id` and `status` come from the tool's answer. The input is recorded whole, with any field named like a key, secret, token or password replaced by `[redacted]`. The log persists across plugin updates.
 
 ## Privacy Policy
 

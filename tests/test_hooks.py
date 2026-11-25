@@ -23,7 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PLUGIN = ROOT / "cpzai"
 GUARD = PLUGIN / "scripts" / "pre_trade_guard.py"
-AUDIT = PLUGIN / "scripts" / "audit-log.sh"
+AUDIT = PLUGIN / "scripts" / "audit_log.py"
 HOOKS = json.loads((PLUGIN / "hooks" / "hooks.json").read_text())
 
 PLUGIN_NAME = "mcp__plugin_cpzai_cpzai__{}"
@@ -55,7 +55,7 @@ ORDER = {
 
 class HookMatchers(unittest.TestCase):
     def test_pre_and_post_hooks_match_the_names_claude_code_gives_plugin_tools(self):
-        for event in ("PreToolUse", "PostToolUse"):
+        for event in ("PreToolUse", "PostToolUse", "PostToolUseFailure"):
             m = matcher(event)
             for tool in ("place_order", "execute_strategy", "delete_webhook", "create_strategy", "configure_overlay"):
                 self.assertTrue(m.search(PLUGIN_NAME.format(tool)), f"{event} misses {tool}")
@@ -127,7 +127,7 @@ class AuditLog(unittest.TestCase):
     def run_audit(self, event: dict) -> dict:
         with tempfile.TemporaryDirectory() as d:
             env = {**os.environ, "CLAUDE_PLUGIN_DATA": d}
-            subprocess.run(["bash", str(AUDIT)], input=json.dumps(event), text=True, env=env, check=True)
+            subprocess.run([str(AUDIT)], input=json.dumps(event), text=True, env=env, check=True)
             lines = (Path(d) / "audit.log").read_text().splitlines()
             self.assertEqual(len(lines), 1)
             return json.loads(lines[0])
@@ -139,6 +139,41 @@ class AuditLog(unittest.TestCase):
         rec = self.run_audit({"tool_name": name, "tool_input": ORDER})
         self.assertIsNone(rec["ok"])
         self.assertEqual(rec["tool"], name)
+
+    # cpzai#3024: a refused order was logged ok, with no broker reply.
+    def test_a_refused_order_is_logged_as_refused_with_the_reason(self):
+        refusal = {"error": "Insufficient buying power", "code": "insufficient_buying_power"}
+        rec = self.run_audit({
+            "hook_event_name": "PostToolUse", "tool_name": PLUGIN_NAME.format("place_order"), "tool_input": ORDER,
+            "tool_response": {"isError": True, "content": [{"type": "text", "text": json.dumps(refusal)}]},
+        })
+        self.assertIs(rec["ok"], False)
+        self.assertEqual(rec["error"], "Insufficient buying power")
+
+    def test_an_accepted_order_is_logged_with_the_broker_order_id_and_status(self):
+        answer = {"data": {"id": "row-1", "order_id": "alp-123", "status": "accepted", "symbol": "AAPL"}}
+        rec = self.run_audit({
+            "hook_event_name": "PostToolUse", "tool_name": PLUGIN_NAME.format("place_order"), "tool_input": ORDER,
+            "tool_response": {"content": [{"type": "text", "text": json.dumps(answer)}]},
+        })
+        self.assertIs(rec["ok"], True)
+        self.assertEqual((rec["order_id"], rec["status"]), ("alp-123", "accepted"))
+
+    def test_a_call_that_failed_outright_is_logged(self):
+        rec = self.run_audit({"hook_event_name": "PostToolUseFailure", "tool_name": PLUGIN_NAME.format("place_order"),
+                              "tool_input": ORDER, "error": "MCP request timed out"})
+        self.assertIs(rec["ok"], False)
+        self.assertEqual(rec["error"], "MCP request timed out")
+
+    def test_the_whole_order_is_kept_and_credentials_are_not(self):
+        long_order = {**ORDER, "order_type": "stop_limit", "stop_price": 199.5, "client_order_id": "c" * 50}
+        rec = self.run_audit({"tool_name": PLUGIN_NAME.format("place_order"), "tool_input": long_order, "tool_response": {"isError": False}})
+        self.assertEqual(rec["input"], long_order)
+        conn = self.run_audit({"tool_name": PLUGIN_NAME.format("create_connection"),
+                               "tool_input": {"connection_type": "polygon", "api_key": "abc123", "secret_token": "s3cr3t"},
+                               "tool_response": {"isError": False}})
+        self.assertEqual(conn["input"], {"connection_type": "polygon", "api_key": "[redacted]", "secret_token": "[redacted]"})
+        self.assertNotIn("abc123", json.dumps(conn))
 
 
 if __name__ == "__main__":
