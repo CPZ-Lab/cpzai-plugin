@@ -128,18 +128,18 @@ Allocate risk (not capital) across factors or strategies.
 
 **Marginal contribution to risk (MCTR):**
 ```
-MCTR_i = w_i × (Σw)_i / σ_portfolio
+MCTR_i = ∂σ_p / ∂w_i = (Σw)_i / σ_p
 ```
 
-The change in portfolio risk from a small increase in position i. Useful for identifying which positions are driving total risk.
+The change in portfolio volatility from a small increase in position i (σ_p = √(w'Σw)).
 
-**Component risk:**
+**Component risk and percent contribution:**
 ```
-CR_i = w_i × MCTR_i
-Σ CR_i = σ²_portfolio
+CR_i  = w_i × MCTR_i = w_i (Σw)_i / σ_p        Σ CR_i  = σ_p
+PCR_i = CR_i / σ_p   = w_i (Σw)_i / (w'Σw)     Σ PCR_i = 100%
 ```
 
-Each position's share of total portfolio variance. If one position contributes 40% of risk but only 10% of weight, it's dominating the portfolio's risk profile.
+PCR_i is each position's share of total portfolio risk, and the shares add up to 100% (Euler's theorem: σ_p is homogeneous of degree one in w). If one position contributes 40% of risk but only 10% of weight, it's dominating the portfolio's risk profile.
 
 **Risk budget target:** set desired risk contribution per position/factor/strategy, then optimize weights to match the budget.
 

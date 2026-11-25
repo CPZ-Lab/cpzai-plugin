@@ -156,7 +156,7 @@ Choosing which instruments to trade is as important as the signal itself.
 Every position gets 1/N of the portfolio. Simple, transparent, avoids concentration.
 
 ### Volatility Parity (Risk Parity)
-Weight inversely proportional to volatility: `w_i = (1/σ_i) / Σ(1/σ_j)`. Equalizes risk contribution.
+Weight inversely proportional to volatility: `w_i = (1/σ_i) / Σ(1/σ_j)`. Equalizes risk contribution only when all pairwise correlations are equal; otherwise it is an approximation, and equal risk contribution needs the ERC solve (see portfolio-optimization).
 
 ### Kelly Criterion
 Optimal sizing: `f = (p * b - q) / b` where p = win probability, b = win/loss ratio, q = 1-p. In practice, use fractional Kelly (0.25-0.5x) to reduce variance.

@@ -72,7 +72,7 @@ Max Drawdown:    XX.X% (current holdings replayed over the bars used)
 |--------|---------------|----------------|---------------|
 | ... | XX.X% | XX.X% | XX.X% |
 
-Flag imbalances: positions where risk contribution far exceeds weight.
+Risk Contrib. is each position's percent contribution `w_i (Σw)_i / (w'Σw)` from the `get_bars` covariance; the column adds up to 100%. Flag imbalances: positions where risk contribution far exceeds weight.
 
 ### 3. Run Optimization
 
@@ -89,7 +89,7 @@ Execute the selected optimization method:
 - Blend views with equilibrium using the BL formula
 
 **Risk Parity:**
-- Each asset contributes equally to total portfolio risk
+- Each asset contributes equally to total portfolio risk: `w_i (Σw)_i / (w'Σw) = 1/N`, solved numerically (inverse volatility is exact only when all correlations are equal)
 - No return assumptions needed — purely risk-based
 
 **HRP (Hierarchical Risk Parity):**

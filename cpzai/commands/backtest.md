@@ -105,7 +105,7 @@ Assess whether results are likely to hold out-of-sample:
 
 - **Parameter sensitivity** — How much do results change with ±20% parameter shifts?
 - **Time stability** — Is performance consistent across sub-periods (halves, thirds)?
-- **Trade count** — Are there enough trades for statistical significance (>30)?
+- **Trade count**: 30+ trades is directional only; a meaningful Sharpe needs 100+, robust inference 250+ (backtesting skill)
 - **Overfitting indicators** — Sharpe > 3.0 in backtest is suspicious; very high win rates with few trades; performance only in one regime
 
 ### 6. Improvement Suggestions

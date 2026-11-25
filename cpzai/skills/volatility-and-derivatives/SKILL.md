@@ -57,7 +57,7 @@ Implied vol varies by strike price:
 **Equity skew:** OTM puts have higher implied vol than ATM or OTM calls. Reflects demand for downside protection and the empirical fact that equities crash more than they spike.
 
 **Skew metrics:**
-- **25-delta risk reversal:** IV(25d put) - IV(25d call). Measures skew direction. Negative for equities (puts more expensive).
+- **25-delta risk reversal:** IV(25d call) - IV(25d put), the market convention. Measures skew direction. Negative for equities (puts carry higher implied vol).
 - **25-delta butterfly:** (IV(25d put) + IV(25d call))/2 - IV(ATM). Measures smile curvature (wing richness).
 
 **What skew tells you:**

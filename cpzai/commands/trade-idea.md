@@ -117,7 +117,7 @@ Sizing methods:
 | Stop Out | $XX.XX | -$XXX (-X.X%) | ~XX% |
 | Worst Case | $XX.XX | -$XXX (-XX.X%) | ~X% |
 
-**Expected value:** (P_bull × R_bull) + (P_base × R_base) + (P_stop × R_stop) = +X.X%
+**Expected value:** (P_bull × R_bull) + (P_base × R_base) + (P_stop × R_stop) + (P_worst × R_worst) = +X.X%, with the four probabilities adding up to 100%
 
 ### 6. Correlation & Portfolio Impact
 

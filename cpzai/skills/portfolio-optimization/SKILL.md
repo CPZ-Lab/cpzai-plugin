@@ -53,7 +53,7 @@ Shrink the sample covariance matrix toward a structured target (e.g. constant co
 ```
 Σ_shrunk = δ F + (1-δ) S
 ```
-Where F = structured target, S = sample covariance, δ = shrinkage intensity (estimated from data). Use `sklearn.covariance.LedoitWolf`.
+Where F = structured target, S = sample covariance, δ = shrinkage intensity (estimated from data). `sklearn.covariance.LedoitWolf` uses one target only, the scaled identity (average variance × I), which pulls every correlation toward zero. For a constant-correlation target (Ledoit and Wolf 2004) or a single-factor target (Ledoit and Wolf 2003), build F and estimate δ yourself.
 
 **Resampled efficient frontier (Michaud):**
 1. Bootstrap many samples from the return distribution
@@ -97,8 +97,8 @@ Decompose covariance through a factor model:
 Where B = N×K factor loading matrix, F = K×K factor covariance, D = N×N diagonal specific variance.
 
 **Advantages:**
-- Requires estimating K(K+1)/2 + 2N parameters instead of N(N+1)/2
-- For 500 stocks with 10 factors: ~5,500 parameters vs ~125,000
+- Requires estimating N×K loadings + K(K+1)/2 factor covariances + N specific variances instead of N(N+1)/2
+- For 500 stocks with 10 factors: 5,000 + 55 + 500 = 5,555 parameters vs 125,250
 - More stable, better conditioned, fewer estimation errors
 
 **Construction:**
@@ -207,7 +207,7 @@ Allocate so each asset contributes equally to portfolio risk.
 
 Find weights such that: `w_i × (Σw)_i / (w'Σw) = 1/N` for all i.
 
-This means each asset's marginal contribution to portfolio volatility is identical. Solved numerically (no closed-form).
+This means each asset's total risk contribution (its weight times its marginal contribution) is identical, so each carries 1/N of portfolio risk. Equal *marginal* contributions, `(Σw)_i` the same for every asset, is a different portfolio: the minimum-variance one. Solved numerically (no closed-form).
 
 ### Inverse Volatility (Simple Approximation)
 
@@ -215,7 +215,7 @@ This means each asset's marginal contribution to portfolio volatility is identic
 w_i = (1/σ_i) / Σ(1/σ_j)
 ```
 
-Quick approximation that ignores correlations. Works well when correlations are roughly uniform.
+Quick approximation that ignores correlations. It gives equal risk contributions exactly only when every pairwise correlation is the same; otherwise use ERC above.
 
 ### Leveraged Risk Parity
 
