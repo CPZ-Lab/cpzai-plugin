@@ -90,7 +90,7 @@ for d in (os.path.join(root, "cpzai", "commands"), os.path.join(root, "cpzai", "
         if not f.endswith(".md"):
             continue
         text = open(os.path.join(d, f)).read()
-        for m in re.finditer(r"mcp__cpzai__([a-z0-9_]+)", text):
+        for m in re.finditer(r"mcp__(?:plugin_cpzai_)?cpzai__([a-z0-9_]+)", text):
             ref.add(m.group(1))
 missing = ref - live
 extra = live - ref

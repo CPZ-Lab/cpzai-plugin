@@ -1,0 +1,145 @@
+#!/usr/bin/env python3
+"""Tests for the plugin's hooks (cpzai#2908).
+
+The pre-trade guard named the CPZAI tools mcp__cpzai__*, while Claude Code
+lists a plugin's bundled MCP tools as mcp__plugin_cpzai_cpzai__*, so the
+guard and the audit log never ran. And the guard blocked every call with
+"ask the user and re-issue", keeping no record of the answer, so a fixed
+name alone would have blocked a confirmed order forever.
+
+Run: python3 tests/test_hooks.py
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+PLUGIN = ROOT / "cpzai"
+GUARD = PLUGIN / "scripts" / "pre_trade_guard.py"
+AUDIT = PLUGIN / "scripts" / "audit-log.sh"
+HOOKS = json.loads((PLUGIN / "hooks" / "hooks.json").read_text())
+
+PLUGIN_NAME = "mcp__plugin_cpzai_cpzai__{}"
+
+
+def run_guard(event: dict | str, **env: str) -> dict | None:
+    full_env = {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE_PLUGIN_OPTION_")}
+    full_env.update(env)
+    raw = event if isinstance(event, str) else json.dumps(event)
+    out = subprocess.run([str(GUARD)], input=raw, capture_output=True, text=True, env=full_env, check=True)
+    return json.loads(out.stdout) if out.stdout.strip() else None
+
+
+def matcher(event: str) -> re.Pattern:
+    entries = HOOKS["hooks"][event]
+    return re.compile(entries[0]["matcher"])
+
+
+ORDER = {
+    "account_id": "PA3VZ41G5INS",
+    "broker_credential_id": "6f1c2e2a-1111-4222-8333-944455556666",
+    "symbol": "AAPL",
+    "side": "buy",
+    "order_type": "limit",
+    "quantity": 10,
+    "price": 200.5,
+}
+
+
+class HookMatchers(unittest.TestCase):
+    def test_pre_and_post_hooks_match_the_names_claude_code_gives_plugin_tools(self):
+        for event in ("PreToolUse", "PostToolUse"):
+            m = matcher(event)
+            for tool in ("place_order", "execute_strategy", "delete_webhook", "create_strategy", "configure_overlay"):
+                self.assertTrue(m.search(PLUGIN_NAME.format(tool)), f"{event} misses {tool}")
+                self.assertTrue(m.search(f"mcp__cpzai__{tool}"), f"{event} misses standalone {tool}")
+
+    def test_reads_are_not_matched(self):
+        for event in ("PreToolUse", "PostToolUse"):
+            m = matcher(event)
+            for tool in ("list_positions", "list_orders", "cash_summary", "get_market_data"):
+                self.assertIsNone(m.search(PLUGIN_NAME.format(tool)))
+            # Another server's tool of the same name is not CPZAI's.
+            self.assertIsNone(m.search("mcp__other__place_order"))
+
+    def test_every_hook_command_exists_and_is_executable(self):
+        for entries in HOOKS["hooks"].values():
+            for entry in entries:
+                for hk in entry["hooks"]:
+                    path = PLUGIN / hk["command"].replace("${CLAUDE_PLUGIN_ROOT}/", "").split()[0]
+                    self.assertTrue(path.exists(), path)
+                    self.assertTrue(os.access(path, os.X_OK), path)
+
+
+class PreTradeGuard(unittest.TestCase):
+    def test_an_order_is_asked_about_once_in_claude_codes_own_prompt_never_blocked(self):
+        out = run_guard({"tool_name": PLUGIN_NAME.format("place_order"), "tool_input": ORDER})
+        self.assertIsNotNone(out)
+        spec = out["hookSpecificOutput"]
+        self.assertEqual(spec["hookEventName"], "PreToolUse")
+        # "ask": the user approves in Claude Code's prompt and the call runs. Never "deny" or block.
+        self.assertEqual(spec["permissionDecision"], "ask")
+        self.assertNotIn("decision", out)
+        reason = spec["permissionDecisionReason"]
+        for part in ("BUY 10 AAPL", "limit 200.5", "PA3VZ41G5INS", "paper"):
+            self.assertIn(part, reason)
+        self.assertNotIn("re-issue", reason)
+
+    def test_a_confirmed_call_is_not_blocked_again(self):
+        # The same call twice: each answer is an ask the user can approve; nothing is ever a block.
+        for _ in range(2):
+            out = run_guard({"tool_name": PLUGIN_NAME.format("place_order"), "tool_input": ORDER})
+            self.assertEqual(out["hookSpecificOutput"]["permissionDecision"], "ask")
+
+    def test_strategy_runs_and_webhook_deletes_are_asked_about(self):
+        run = run_guard({"tool_name": PLUGIN_NAME.format("execute_strategy"), "tool_input": {"strategy_id": "s-1"}})
+        self.assertIn("can submit orders", run["hookSpecificOutput"]["permissionDecisionReason"])
+        self.assertIn("not a backtest", run["hookSpecificOutput"]["permissionDecisionReason"])
+        delete = run_guard({"tool_name": PLUGIN_NAME.format("delete_webhook"), "tool_input": {"id": "w-1"}})
+        self.assertIn("w-1", delete["hookSpecificOutput"]["permissionDecisionReason"])
+
+    def test_live_default_environment_is_named(self):
+        out = run_guard({"tool_name": PLUGIN_NAME.format("place_order"), "tool_input": ORDER},
+                        CLAUDE_PLUGIN_OPTION_DEFAULT_ENVIRONMENT="live")
+        self.assertIn("default trading environment is live", out["hookSpecificOutput"]["permissionDecisionReason"])
+
+    def test_opt_out_leaves_the_normal_permission_flow(self):
+        self.assertIsNone(run_guard({"tool_name": PLUGIN_NAME.format("place_order"), "tool_input": ORDER},
+                                    CLAUDE_PLUGIN_OPTION_REQUIRE_TRADE_CONFIRMATION="false"))
+
+    def test_other_tools_pass(self):
+        self.assertIsNone(run_guard({"tool_name": PLUGIN_NAME.format("list_positions"), "tool_input": {}}))
+        self.assertIsNone(run_guard({"tool_name": "mcp__other__place_order", "tool_input": ORDER}))
+
+    def test_an_unreadable_event_is_asked_about_not_let_through(self):
+        out = run_guard("not json")
+        self.assertEqual(out["hookSpecificOutput"]["permissionDecision"], "ask")
+
+
+class AuditLog(unittest.TestCase):
+    def run_audit(self, event: dict) -> dict:
+        with tempfile.TemporaryDirectory() as d:
+            env = {**os.environ, "CLAUDE_PLUGIN_DATA": d}
+            subprocess.run(["bash", str(AUDIT)], input=json.dumps(event), text=True, env=env, check=True)
+            lines = (Path(d) / "audit.log").read_text().splitlines()
+            self.assertEqual(len(lines), 1)
+            return json.loads(lines[0])
+
+    def test_records_the_outcome_from_the_tool_response_never_assumes_ok(self):
+        name = PLUGIN_NAME.format("place_order")
+        self.assertIs(self.run_audit({"tool_name": name, "tool_input": ORDER, "tool_response": {"isError": True}})["ok"], False)
+        self.assertIs(self.run_audit({"tool_name": name, "tool_input": ORDER, "tool_response": {"isError": False}})["ok"], True)
+        rec = self.run_audit({"tool_name": name, "tool_input": ORDER})
+        self.assertIsNone(rec["ok"])
+        self.assertEqual(rec["tool"], name)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

@@ -26,7 +26,15 @@ try:
 except Exception:
     d = {}
 tool = d.get("tool_name") or d.get("toolName") or ""
-ok = d.get("success", True)
+# PostToolUse carries the tool's answer, not a success flag: an MCP error
+# result says isError. Anything else is recorded as unknown, never as ok.
+resp = d.get("tool_response") if "tool_response" in d else d.get("toolResponse")
+if isinstance(resp, dict) and isinstance(resp.get("isError"), bool):
+    ok = not resp["isError"]
+elif isinstance(resp, dict) and resp.get("success") is False:
+    ok = False
+else:
+    ok = None
 inp = d.get("tool_input") or d.get("toolInput") or {}
 input_preview = json.dumps(inp, separators=(",", ":"))[:240]
 record = {"ts": ts, "tool": tool, "ok": ok, "input_preview": input_preview}
