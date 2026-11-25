@@ -12,22 +12,34 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "mcp__cpzai__place_order|mcp__cpzai__execute_strategy|mcp__cpzai__create_strategy|mcp__cpzai__update_strategy|mcp__cpzai__delete_webhook|mcp__cpzai__create_webhook|mcp__cpzai__sync_portfolio|mcp__cpzai__create_connection",
+        "matcher": "^mcp__(plugin_cpzai_)?cpzai__(place_order|execute_strategy|create_strategy|update_strategy|configure_overlay|create_webhook|delete_webhook|sync_portfolio|create_connection)$",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre-trade-guard.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/pre_trade_guard.py",
+            "onFailure": "block"
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "mcp__cpzai__place_order|mcp__cpzai__execute_strategy|mcp__cpzai__create_strategy|mcp__cpzai__update_strategy|mcp__cpzai__sync_portfolio|mcp__cpzai__create_webhook|mcp__cpzai__delete_webhook|mcp__cpzai__create_connection",
+        "matcher": "^mcp__(plugin_cpzai_)?cpzai__(place_order|execute_strategy|create_strategy|update_strategy|configure_overlay|create_webhook|delete_webhook|sync_portfolio|create_connection)$",
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/audit-log.sh"
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/audit_log.py"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "^mcp__(plugin_cpzai_)?cpzai__(place_order|execute_strategy|create_strategy|update_strategy|configure_overlay|create_webhook|delete_webhook|sync_portfolio|create_connection)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/audit_log.py"
           }
         ]
       }

@@ -8,21 +8,23 @@ tools:
   - Read
   - Bash
   - TodoWrite
-  - mcp__cpzai__list_positions
-  - mcp__cpzai__list_accounts
-  - mcp__cpzai__get_market_data
-  - mcp__cpzai__compute_risk
-  - mcp__cpzai__list_risk_snapshots
-  - mcp__cpzai__list_orders
+  - mcp__plugin_cpzai_cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__list_accounts
+  - mcp__plugin_cpzai_cpzai__cash_summary
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__get_bars
+  - mcp__plugin_cpzai_cpzai__compute_risk
+  - mcp__plugin_cpzai_cpzai__list_risk_snapshots
+  - mcp__plugin_cpzai_cpzai__list_orders
 skills:
   - risk-management
   - portfolio-analytics
 disallowedTools:
-  - mcp__cpzai__place_order
-  - mcp__cpzai__execute_strategy
-  - mcp__cpzai__create_strategy
-  - mcp__cpzai__update_strategy
-  - mcp__cpzai__delete_webhook
+  - mcp__plugin_cpzai_cpzai__place_order
+  - mcp__plugin_cpzai_cpzai__execute_strategy
+  - mcp__plugin_cpzai_cpzai__create_strategy
+  - mcp__plugin_cpzai_cpzai__update_strategy
+  - mcp__plugin_cpzai_cpzai__delete_webhook
 ---
 
 # Risk Auditor
@@ -37,12 +39,12 @@ For every audit, complete the following dimensions:
 - Gross exposure (sum of |position values| / equity)
 - Net exposure (sum of position values / equity)
 - Cash buffer (% of portfolio)
-- Margin used and headroom
+- Equity and buying power from `cash_summary` (margin used is not available from CPZAI)
 
 ### 2. Concentration
 - Largest single position (flag if > 15%)
 - Top-3 weight (flag if > 35%)
-- Sector concentration (flag any sector > 30%)
+- Sector concentration from each position's `sector` in `list_positions` (flag any sector > 30%; "sector not recorded" where null, never guessed)
 - Factor exposure (beta, momentum tilt, value tilt, size tilt)
 
 ### 3. Correlation

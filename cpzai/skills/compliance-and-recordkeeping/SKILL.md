@@ -34,7 +34,7 @@ For every order, capture and retain at minimum:
 | Fill events (price, qty, venue, timestamp) | Best-execution evidence |
 | Cancellation events (reason, timestamp) | Demonstrate intent and process |
 
-**Retention:** SEC Rule 17a-4 requires registered broker-dealers to keep order records for 6 years (first 2 readily accessible). Retail traders are not subject to 17a-4 directly, but the best practice is still 7 years on tax-deductible activities and indefinitely on long-term investing decisions.
+**Retention:** SEC Rule 17a-4(b)(1) requires registered broker-dealers to keep order memoranda (Rule 17a-3(a)(6)) for 3 years, the first 2 in an easily accessible place; blotters and ledgers (17a-3(a)(1) to (3)) are kept 6 years under 17a-4(a). Retail traders are not subject to 17a-4 directly, but the best practice is still 7 years on tax-deductible activities and indefinitely on long-term investing decisions.
 
 ## Decision Audit Trail
 
@@ -98,7 +98,7 @@ When changes happen, append to the change log; do not edit prior entries.
 
 ### United States
 
-- **SEC Rule 17a-4** (broker-dealers): 6-year order record retention, write-once media or equivalent, designated third-party access in case of failure.
+- **SEC Rule 17a-4** (broker-dealers): order memoranda 3 years and blotters and ledgers 6 years (first 2 easily accessible in both cases), write-once media or equivalent, designated third-party access in case of failure.
 - **FINRA Rule 4511 / 4512**: customer account records, supervisory procedures.
 - **Reg SHO**: short sale recordkeeping; locate and close-out requirements.
 - **Reg ATS / Reg NMS**: order routing disclosure for those who route.

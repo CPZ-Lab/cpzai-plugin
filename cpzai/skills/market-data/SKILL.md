@@ -31,7 +31,7 @@ Real-time best bid and ask prices. The spread (ask - bid) is a direct trading co
 
 ### Fundamental Data
 
-Financial statement data (revenue, earnings, margins, balance sheet items). Available quarterly or annually.
+Financial statement data (revenue, earnings, margins, balance sheet items). Available quarterly or annually from fundamentals vendors. No CPZAI tool returns it: mark such figures "not available from CPZAI" rather than quoting them from memory.
 
 - **Point-in-time:** use the data as it was available on each date (avoids look-ahead bias)
 - **Restatements:** historical financials can change — point-in-time databases handle this
@@ -136,10 +136,11 @@ CPZAI integrates with multiple data providers:
 
 When ~~cpzai is connected, execute this workflow:
 
-1. **`get_market_data`** — fetch real-time quotes (price, bid/ask, volume) for target symbols
-2. **`list_positions`** — check if any scanned symbols are already in the portfolio
-3. **`compute_risk`** — understand current portfolio context before evaluating new opportunities
-4. **Synthesize:** apply technical indicator analysis from this skill to the price data. Compare volume to historical averages, assess spread quality, note any data quality issues.
+1. **`get_market_data`**: fetch real-time quotes (price, change, bid/ask, volume) for target symbols
+2. **`get_bars`**: daily history for the indicators in this skill (moving averages, RSI, relative volume, 52-week range, realized volatility)
+3. **`list_positions`**: check if any scanned symbols are already in the portfolio
+4. **`compute_risk`**: understand current portfolio context before evaluating new opportunities
+5. **Synthesize:** apply technical indicator analysis from this skill to the price data. Compare volume to historical averages, assess spread quality, note any data quality issues.
 
 **For multi-symbol scans:**
 Call `get_market_data` with a batch of symbols (e.g. sector constituents). Sort by the most relevant metric (volume surge, price change, spread). Highlight standouts and cross-reference with portfolio exposure from `list_positions`.

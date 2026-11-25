@@ -192,7 +192,7 @@ At each stage, compare actual performance to expected performance. If live Sharp
 
 CPZAI's primary broker integration. Supports:
 - Stocks and ETFs (US markets)
-- Market, limit, stop, stop-limit, trailing stop orders
+- Market, limit, stop, stop-limit and trailing stop orders at the broker (through CPZAI's `place_order`: market, limit, stop and stop-limit day orders)
 - Paper and live accounts
 - Real-time order status via WebSocket
 - Fractional shares
@@ -207,8 +207,8 @@ Available for users who need:
 
 ### Order Routing Best Practices
 
-1. Always specify `time_in_force` (day, GTC, IOC, FOK)
-2. Use `extended_hours: false` unless you specifically want pre/post-market fills
+1. Through CPZAI's `place_order` an order is `market`, `limit`, `stop` or `stop_limit`, with `time_in_force: day` only; `stop` and `stop_limit` need `stop_price`, `limit` and `stop_limit` need `price`, and the size is a share quantity. GTC, IOC, FOK, extended hours, trailing stops and brackets are not available through it: describe them as broker features the user sets at the broker
+2. Never resend an order after a timeout or an unclear answer: look for it in `list_orders` first (see /cpzai:trade)
 3. For strategies, prefer limit orders with a small buffer above/below current price
 4. Monitor order status — don't assume fills; handle rejections and partial fills
 
@@ -217,7 +217,7 @@ Available for users who need:
 When ~~cpzai is connected, execute this workflow:
 
 **Pre-trade:**
-1. **`list_accounts`** — verify which broker accounts are connected and check buying power
+1. **`list_accounts`**: verify the account is `tradable` and in the intended `environment` (paper or live); **`cash_summary`**: its buying power (last sync; unknown if `stale`)
 2. **`list_positions`** — check current holdings to avoid duplicates or unintended concentration
 3. **`get_market_data`** — get current price, bid/ask spread, and volume for the target symbol
 4. **`compute_risk`** — evaluate current portfolio risk before adding new exposure
@@ -231,7 +231,7 @@ When ~~cpzai is connected, execute this workflow:
 8. **`compute_risk`** — recompute risk metrics to verify the new position hasn't pushed the portfolio outside risk limits
 
 **For strategy-driven execution:**
-1. **`execute_strategy`** — run the strategy to generate signals
+1. **`execute_strategy`**: run the strategy (only when the user has authorized a live run: it can submit orders itself, so check `list_orders` before placing anything by hand)
 2. **`list_positions`** — compare current holdings to target portfolio
 3. **`place_order`** (multiple) — execute the rebalancing trades
 4. **`sync_portfolio`** — reconcile after all orders fill

@@ -1,14 +1,17 @@
 ---
 description: View your current portfolio positions — holdings, P&L, weights, and today's movers
 allowed-tools:
-  - mcp__cpzai__list_positions
-  - mcp__cpzai__list_accounts
-  - mcp__cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__list_accounts
+  - mcp__plugin_cpzai_cpzai__cash_summary
+  - mcp__plugin_cpzai_cpzai__get_market_data
 ---
 
 # Positions
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 Pull your live portfolio positions and present a clean summary with P&L, weights, and today's activity.
 
@@ -25,8 +28,9 @@ No arguments needed — pulls all open positions from connected accounts.
 ### 1. Fetch Positions
 
 If ~~cpzai is connected:
-- Call `list_positions` to get all open positions
-- Call `list_accounts` for account-level info (equity, buying power)
+- Call `list_positions` and keep paging (`offset` += rows returned) until a page comes back shorter than the limit; `count` is the page size, not the total. Read `account_errors`: an account named there was not read, so totals leave it out and say so
+- Call `cash_summary` for equity and buying power per account (last sync: show `as_of`, and say so when `stale` is true)
+- Call `list_accounts` for each account's broker and environment (paper or live); it holds no balances
 - Call `get_market_data` for current prices on all held symbols
 
 If no connection:
@@ -37,11 +41,13 @@ If no connection:
 ```
 PORTFOLIO — [Date]
 ══════════════════
-Total Equity:     $XX,XXX.XX
-Buying Power:     $XX,XXX.XX
+Paper:            Equity $XX,XXX.XX   Buying Power $XX,XXX.XX
+Live:             Equity $XX,XXX.XX   Buying Power $XX,XXX.XX
 Positions:        XX open
 Today's P&L:      +$XXX.XX (+X.XX%)
 ```
+
+Paper and live money are never added together: `cash_summary` leaves its headline total empty when both are present, and `totals.by_environment` has each.
 
 ### 3. Holdings Table
 

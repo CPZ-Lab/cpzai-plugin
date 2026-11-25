@@ -57,7 +57,7 @@ Implied vol varies by strike price:
 **Equity skew:** OTM puts have higher implied vol than ATM or OTM calls. Reflects demand for downside protection and the empirical fact that equities crash more than they spike.
 
 **Skew metrics:**
-- **25-delta risk reversal:** IV(25d put) - IV(25d call). Measures skew direction. Negative for equities (puts more expensive).
+- **25-delta risk reversal:** IV(25d call) - IV(25d put), the market convention. Measures skew direction. Negative for equities (puts carry higher implied vol).
 - **25-delta butterfly:** (IV(25d put) + IV(25d call))/2 - IV(ATM). Measures smile curvature (wing richness).
 
 **What skew tells you:**
@@ -242,7 +242,7 @@ Trade volatility across:
 
 ## CPZAI Tool Chaining for Volatility Analysis
 
-1. **`get_market_data`** — fetch current prices and recent history for vol computation
+1. **`get_market_data`**: current price of the underlying; **`get_bars`**: its history, for realized volatility. No CPZAI tool returns option chains, implied volatility or Greeks: mark them "not available from CPZAI" unless the user supplies them
 2. **`compute_risk`** — get portfolio-level vol, VaR, and beta
 3. **`list_positions`** — identify current exposures for Greeks netting
 4. **`list_risk_snapshots`** — track vol regime changes over time

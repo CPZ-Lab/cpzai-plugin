@@ -2,16 +2,18 @@
 description: Build a trading strategy from a natural language idea — generates Python code and creates it on the platform
 argument-hint: "<strategy description>"
 allowed-tools:
-  - mcp__cpzai__list_strategies
-  - mcp__cpzai__get_strategy
-  - mcp__cpzai__create_strategy
-  - mcp__cpzai__update_strategy
-  - mcp__cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__list_strategies
+  - mcp__plugin_cpzai_cpzai__get_strategy
+  - mcp__plugin_cpzai_cpzai__create_strategy
+  - mcp__plugin_cpzai_cpzai__update_strategy
+  - mcp__plugin_cpzai_cpzai__get_market_data
 ---
 
 # Strategy Builder
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: This command generates strategy code to assist development. All strategies should be thoroughly backtested and reviewed before live deployment. Trading carries risk of loss.
 
@@ -48,15 +50,22 @@ If any critical element is missing, ask one focused follow-up question. Don't as
 
 ### 2. Generate the Strategy Code
 
-Write a complete Python strategy following standard systematic trading conventions:
+Write `strategy.py` in the format CPZAI's Strategy Lab backtests. Code in any other shape (a class, a script, a function under another name) fails before its first bar with "No strategy interface function is available".
 
-Requirements:
-- Clean, readable Python with clear parameter definitions and defaults
-- Signal logic separated from execution logic
-- Position sizing with configurable method (equal-weight, vol-scaled, or signal-weighted)
-- Risk checks built in (max position size, exposure limits, stop-loss levels)
-- Use standard libraries (numpy, pandas) for calculations
-- Keep it simple — no over-engineering for a first version; fewer parameters = less overfitting
+The format:
+- A flat module of imports, constants and functions. No class wrapping the signal, no code that runs at import time beyond definitions
+- `SYMBOLS = ["AAPL", "MSFT", ...]`: a literal list of every ticker the code reads, including a benchmark or filter symbol such as SPY. Never a function call, comprehension or screener result
+- Exactly one module-level signal function:
+  - `def generate_signals(data, state, **kwargs)` (preferred) or `def generate_signal(data, state)`: `data` holds point-in-time history per symbol (polars DataFrames with `timestamp, open, high, low, close, volume`); return a dict of symbol to target weight
+  - or `def on_bar(context, data)`, which calls `context.target_weights(weights)`
+- Weights, not share quantities or orders: an empty dict means no rebalance, an explicit 0 closes a position. The backtest fills at the next bar's open
+- Use only the supplied history: no broker orders, live data, API clients or screeners inside the signal or at import
+- numpy and polars are available; for pandas, build the frame with `pd.DataFrame(df.to_dict(as_series=False))` (`to_pandas()` needs pyarrow, which the runner does not have)
+
+Within that format:
+- Clear parameters with defaults as module constants
+- Position sizing in the returned weights (equal-weight, vol-scaled, or signal-weighted), with caps on single-name weight and gross exposure
+- Keep it simple: fewer parameters means less overfitting
 
 ### 3. Explain the Logic
 
@@ -69,10 +78,10 @@ Provide a brief summary covering:
 ### 4. Create on the Platform
 
 If ~~cpzai is connected:
-- Call `create_strategy` with the generated code
+- Call `create_strategy` with the generated code as `python_code`
 - Set strategy type, title, and description
 - Report the created strategy ID back to the user
-- Suggest next step: "Run `/cpzai:backtest` to test this strategy"
+- Suggest next step: "Backtest it in CPZAI Strategy Lab, then run `/cpzai:backtest` to analyze the run"
 
 If no connection:
 > Connect your CPZAI account to create the strategy automatically. For now, here's the code — you can paste it into the Strategy Lab at [ai.cpz-lab.com](https://ai.cpz-lab.com).

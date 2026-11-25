@@ -2,15 +2,17 @@
 description: List, view, and manage your trading strategies — status, last backtest, and quick actions
 argument-hint: "[strategy name | list | status]"
 allowed-tools:
-  - mcp__cpzai__list_strategies
-  - mcp__cpzai__get_strategy
-  - mcp__cpzai__get_backtest_results
-  - mcp__cpzai__update_strategy
+  - mcp__plugin_cpzai_cpzai__list_strategies
+  - mcp__plugin_cpzai_cpzai__get_strategy
+  - mcp__plugin_cpzai_cpzai__get_backtest_results
+  - mcp__plugin_cpzai_cpzai__update_strategy
 ---
 
 # Strategies
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 View and manage your strategy library — list all strategies, check status, view code, or take quick actions.
 

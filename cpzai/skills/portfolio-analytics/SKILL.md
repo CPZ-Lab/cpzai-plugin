@@ -179,7 +179,7 @@ When ~~cpzai is connected, execute this workflow:
 
 1. **`sync_portfolio`** — force-sync all broker accounts to ensure positions are current
 2. **`list_positions`** — get all holdings with quantity, entry price, and current P&L
-3. **`list_accounts`** — get account equity, cash, buying power, margin
+3. **`cash_summary`**: account equity, cash and buying power as last synced (margin is not available from CPZAI)
 4. **`get_market_data`** — fetch current prices for all held symbols (for real-time valuation)
 5. **`compute_risk`** — get VaR, Sharpe, Sortino, beta, max drawdown, risk score
 6. **`list_risk_snapshots`** — pull 30-day risk history for trend analysis
@@ -187,7 +187,7 @@ When ~~cpzai is connected, execute this workflow:
 
 **Synthesize:** combine all data into a complete portfolio review:
 - Compute weights from position values / total equity
-- Run attribution analysis (sector decomposition, factor exposure)
+- Run attribution by sector where `list_positions` records one (factor exposure is not available from CPZAI)
 - Compare risk metrics to historical average from snapshots
 - Flag concentration, correlation, and drawdown concerns
 - Identify winners/losers and assess holding periods

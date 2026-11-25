@@ -2,13 +2,16 @@
 description: Scan markets by sector, theme, or custom criteria with real-time data
 argument-hint: "<sector | theme | symbols>"
 allowed-tools:
-  - mcp__cpzai__get_market_data
-  - mcp__cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__get_bars
+  - mcp__plugin_cpzai_cpzai__list_positions
 ---
 
 # Market Scan
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: Market scans provide information for research purposes only. They do not constitute buy/sell recommendations. All investment decisions should be made independently.
 
@@ -42,6 +45,7 @@ Map the user's input to a concrete list of symbols:
 If ~~cpzai is connected:
 - Call `get_market_data` for all symbols in the universe
 - Collect: price, change, volume, bid/ask spread
+- Call `get_bars` (daily, at least 200 sessions) for relative volume, the 50 and 200-day averages, RSI and realized volatility
 
 If no connection:
 > Connect your CPZAI account to pull real-time quotes. I can still provide analysis frameworks and discuss the sector/theme qualitatively.

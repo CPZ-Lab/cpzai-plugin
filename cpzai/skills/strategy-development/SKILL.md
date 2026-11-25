@@ -156,7 +156,7 @@ Choosing which instruments to trade is as important as the signal itself.
 Every position gets 1/N of the portfolio. Simple, transparent, avoids concentration.
 
 ### Volatility Parity (Risk Parity)
-Weight inversely proportional to volatility: `w_i = (1/σ_i) / Σ(1/σ_j)`. Equalizes risk contribution.
+Weight inversely proportional to volatility: `w_i = (1/σ_i) / Σ(1/σ_j)`. Equalizes risk contribution only when all pairwise correlations are equal; otherwise it is an approximation, and equal risk contribution needs the ERC solve (see portfolio-optimization).
 
 ### Kelly Criterion
 Optimal sizing: `f = (p * b - q) / b` where p = win probability, b = win/loss ratio, q = 1-p. In practice, use fractional Kelly (0.25-0.5x) to reduce variance.
@@ -172,7 +172,8 @@ When ~~cpzai is connected, use these tools in sequence:
 2. **`get_strategy`** — inspect a specific strategy's configuration and parameters
 3. **`create_strategy`** — create a new strategy from generated Python code
 4. **`update_strategy`** — modify parameters or code of an existing strategy
-5. **`execute_strategy`** — run the strategy on the compute backend (backtest or live)
-6. **`get_backtest_results`** — pull performance metrics after execution
+5. **`get_backtest_results`**: read the saved backtest runs once the user has run the strategy in CPZAI Strategy Lab
 
-**Workflow:** Design the signal logic using the frameworks above, then call `create_strategy` to deploy it. Follow up with `execute_strategy` to backtest, and `get_backtest_results` to evaluate. Iterate by calling `update_strategy` with refined parameters.
+`execute_strategy` runs the strategy's code and can submit orders; it is not a backtest and takes no date range. No CPZAI tool starts a backtest: runs are started in CPZAI Strategy Lab. Never call `execute_strategy` to backtest; it runs the strategy's code and can submit orders.
+
+**Workflow:** Design the signal logic using the frameworks above, then call `create_strategy` to save it. Ask the user to backtest it in Strategy Lab, and read the result with `get_backtest_results`. Iterate by calling `update_strategy` with refined parameters.

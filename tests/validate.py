@@ -27,27 +27,26 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PLUGIN = ROOT / "cpzai"
 
-# Live tool list as of plugin v2.0.0. Update when the MCP server adds tools.
+# Live tool list (the MCP server's tools/list, mirrored in CPZ-Lab/cpzai
+# src/lib/mcp-tool-catalog.json). Update when the MCP server adds tools.
 LIVE_TOOLS = {
-    "list_strategies",
-    "get_strategy",
-    "create_strategy",
-    "update_strategy",
-    "get_backtest_results",
-    "list_orders",
-    "place_order",
-    "list_positions",
-    "sync_portfolio",
-    "list_accounts",
-    "get_market_data",
-    "compute_risk",
-    "list_risk_snapshots",
-    "execute_strategy",
-    "list_webhooks",
-    "create_webhook",
-    "delete_webhook",
-    "get_profile",
+    "add_to_watchlist", "cash_summary", "compute_risk", "configure_overlay",
+    "create_connection", "create_strategy", "create_webhook", "delete_webhook",
+    "execute_strategy", "export_transactions", "get_backtest_result",
+    "get_backtest_results", "get_bars", "get_data_file", "get_market_data",
+    "get_order", "get_overlay_exposure", "get_profile", "get_risk_snapshot",
+    "get_strategy", "list_accounts", "list_cash_flows", "list_connections",
+    "list_data_files", "list_deals", "list_fund_periods", "list_journal_entries",
+    "list_lifecycle_events", "list_orders", "list_overlays", "list_positions",
+    "list_risk_snapshots", "list_strategies", "list_watchlist", "list_webhooks",
+    "place_order", "remove_from_watchlist", "sync_portfolio", "update_strategy",
 }
+
+# Claude Code names a plugin's bundled MCP tools mcp__plugin_<plugin>_<server>__<tool>.
+# Inside this plugin the CPZAI tools are mcp__plugin_cpzai_cpzai__<tool>; the short
+# mcp__cpzai__<tool> names no tool, so a tools: list or a hook matcher written with
+# it silently does nothing (cpzai#2908).
+PLUGIN_SERVER = "plugin_cpzai_cpzai"
 
 # Built-in Claude Code tools that may appear in allowed-tools.
 BUILTIN_TOOLS = {
@@ -236,7 +235,9 @@ def validate_command(path: Path) -> None:
                 m = TOOL_REF.match(t)
                 if m:
                     server, tool = m.group(1), m.group(2)
-                    if server == "cpzai" and tool not in LIVE_TOOLS:
+                    if server == "cpzai":
+                        err(f"{rel}: allowed-tools names '{t}'; inside the plugin the tool is mcp__{PLUGIN_SERVER}__{tool}")
+                    elif server == PLUGIN_SERVER and tool not in LIVE_TOOLS:
                         err(f"{rel}: allowed-tools references unknown CPZAI tool '{tool}'")
                 elif t not in BUILTIN_TOOLS and not t.startswith("Bash("):
                     warn(f"{rel}: allowed-tools entry '{t}' is not a known built-in or mcp__server__tool reference")
@@ -269,11 +270,16 @@ def validate_agent(path: Path) -> None:
             err(f"{rel}: missing '{required}' in frontmatter")
     if "name" in fm and not KEBAB.match(fm["name"]):
         err(f"{rel}: agent name '{fm['name']}' is not kebab-case")
-    if "tools" in fm and isinstance(fm["tools"], list):
-        for t in fm["tools"]:
-            m = TOOL_REF.match(t)
-            if m and m.group(1) == "cpzai" and m.group(2) not in LIVE_TOOLS:
-                err(f"{rel}: tools references unknown CPZAI tool '{m.group(2)}'")
+    for key in ("tools", "disallowedTools"):
+        if key in fm and isinstance(fm[key], list):
+            for t in fm[key]:
+                m = TOOL_REF.match(t)
+                if not m:
+                    continue
+                if m.group(1) == "cpzai":
+                    err(f"{rel}: {key} names '{t}'; inside the plugin the tool is mcp__{PLUGIN_SERVER}__{m.group(2)}")
+                elif m.group(1) == PLUGIN_SERVER and m.group(2) not in LIVE_TOOLS:
+                    err(f"{rel}: {key} references unknown CPZAI tool '{m.group(2)}'")
 
 
 def main() -> int:
@@ -302,7 +308,7 @@ def main() -> int:
         validate_agent(a)
 
     scripts_dir = PLUGIN / "scripts"
-    scripts = sorted(scripts_dir.glob("*.sh")) if scripts_dir.exists() else []
+    scripts = sorted([*scripts_dir.glob("*.sh"), *scripts_dir.glob("*.py")]) if scripts_dir.exists() else []
     print(f"  scripts:  {len(scripts)}")
     for sc in scripts:
         if not (sc.stat().st_mode & stat.S_IXUSR):

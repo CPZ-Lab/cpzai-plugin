@@ -60,7 +60,7 @@ Where:
 - **BR** = Breadth (number of independent bets per year)
 
 **Implications:**
-- A small IC (0.03) can produce a good IR if breadth is high (500 stocks daily = BR of ~125,000 per year)
+- A small IC (0.03) can produce a good IR if breadth is high. Breadth counts independent forecasts, not trades: 500 stocks rebalanced daily on a signal that persists about a month give roughly 500 × 12 = 6,000 independent bets a year (IR ≈ 0.03 × √6,000 ≈ 2.3 before costs), not 500 × 252
 - A high IC (0.10) with low breadth (10 bets per year) produces a mediocre IR
 - This is why systematic strategies that trade many instruments frequently outperform concentrated stock picking on a risk-adjusted basis — even with much weaker per-stock skill
 
@@ -97,7 +97,7 @@ The Spearman rank correlation between your signal values today and the subsequen
 IR ≈ IC × √BR
 ```
 
-Where IR = information ratio, BR = breadth (number of independent bets per year). With IC = 0.03 and BR = 500 (trading 500 stocks daily), IR ≈ 0.03 × √500 ≈ 0.67 — a respectable risk-adjusted return.
+Where IR = information ratio, BR = breadth (number of independent bets per year). With IC = 0.03 and BR = 500 (500 stocks, one independent forecast per stock per year), IR ≈ 0.03 × √500 ≈ 0.67. The same IC with forecasts that renew monthly (BR ≈ 6,000) gives IR ≈ 2.3 before costs: count how often the forecasts are genuinely new, not how often the book trades.
 
 ### IC Analysis Best Practices
 
@@ -302,9 +302,9 @@ This reveals the unique information each signal contributes. If a signal has zer
 
 ## CPZAI Tool Chaining for Alpha Research
 
-1. **`get_market_data`** — fetch current and historical prices for signal computation
+1. **`get_bars`**: historical prices for signal computation (`get_market_data` is the current quote only)
 2. **`list_strategies`** / **`get_strategy`** — review existing strategies and their signal logic
-3. **`execute_strategy`** — run a backtest with the new signal
+3. **Backtest in CPZAI Strategy Lab** (the user starts the run). No CPZAI tool starts a backtest: runs are started in CPZAI Strategy Lab. Never call `execute_strategy` to backtest; it runs the strategy's code and can submit orders.
 4. **`get_backtest_results`** — pull performance metrics (Sharpe, turnover, drawdown)
-5. **`compute_risk`** — check factor exposures of the signal-driven portfolio
+5. **`compute_risk`**: portfolio risk of the current book (it returns no factor exposures; compute any from `get_bars` and say so)
 6. **`create_strategy`** — deploy the validated signal as a new strategy

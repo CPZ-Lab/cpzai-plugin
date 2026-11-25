@@ -4,6 +4,28 @@ All notable changes to the CPZAI plugin are documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-11-25
+
+### Fixed
+- The pre-trade guard and the audit log never ran: they matched `mcp__cpzai__*`, while Claude Code names this plugin's tools `mcp__plugin_cpzai_cpzai__*`. The hooks now match both spellings, and every `allowed-tools`, `tools` and `disallowedTools` list uses the plugin names, so the agents can reach the CPZAI tools at all (cpzai#2908).
+- The guard blocked every order and strategy run with "ask the user and re-issue", keeping no record of the answer, so a confirmed call was blocked again. It now answers `permissionDecision: "ask"`: Claude Code shows the call once with a summary and runs it when the user approves (cpzai#2908). It is now `scripts/pre_trade_guard.py`.
+- The audit log recorded `ok: true` for every call (it read a `success` field PostToolUse does not send). It now reads the tool's answer and records `null` when the answer does not say.
+- `/backtest` and the backtesting, strategy-development and alpha-research skills sent Claude to `execute_strategy` to backtest. That tool runs the strategy's code and can submit orders. `/backtest` now reads saved runs only and says runs start in CPZAI Strategy Lab; the quant-researcher agent can no longer call `execute_strategy` (cpzai#2797).
+- Equity, cash and buying power came from `list_accounts`, which holds no balances. Commands, skills and agents now use `cash_summary` (cpzai#2906).
+- Commands and skills asked for figures no tool returns (IV, Greeks, P/E, ROE, sector and factor exposure, week and month P&L, margin used) and pointed history-based figures (52-week range, moving averages, RSI, relative volume, per-holding beta and volatility, covariance) at the quote or the risk check. History now comes from `get_bars`; every command says to write "not available from CPZAI" for the rest, never fill it from memory; CONNECTORS.md lists what each tool returns (cpzai#2886, cpzai#2909).
+
+- The audit log (now `scripts/audit_log.py`) logged a refused order as ok, kept no broker reply, skipped calls that failed outright and cut the input at 240 characters. It now records refusals with their reason, the broker's order id and status, failed calls (PostToolUseFailure), and the whole input with credential fields redacted (cpzai#3024).
+- The risk-management skill's risk contributions had an extra weight and added up to far more than 100%; portfolio-optimization described risk parity with the minimum-variance condition; strategy-development said inverse volatility equalizes risk contribution without the equal-correlation condition (cpzai#3012).
+- Six formulas and rules: risk reversal sign, breadth, factor model parameter count, what scikit-learn's Ledoit-Wolf shrinks toward, the trade count for a meaningful backtest, and /trade-idea's expected value leaving out the worst case (cpzai#3022).
+- SEC Rule 17a-4 retention: order memoranda 3 years, blotters and ledgers 6 (cpzai#3023).
+- `/trade` takes a stop price, takes shares only, says orders are day orders, shows the limit and stop before approval, and never resends after a timeout; order-execution no longer offers GTC, IOC, FOK, extended hours, trailing or bracket orders through `place_order` (cpzai#3014, cpzai#3034).
+- `/strategy-builder` writes the format Strategy Lab backtests: `SYMBOLS` and one module-level `generate_signals`, `generate_signal` or `on_bar` (cpzai#3013).
+- `/positions`, `/portfolio-review`, `/risk-report` and `/orders` page until a short page instead of treating one page as the whole book (cpzai#3037).
+- The pre-trade guard fails closed: empty or malformed events, unrecognised tool names and errors inside the guard are asked about instead of passing. The session banner reads the confirmation option as the guard does and says when python3 is missing.
+
+### Added
+- `tests/test_hooks.py` and `tests/test_content.py`, run by `tests/run-all.sh` and CI.
+
 ## [2.0.0] — 2026-04-30
 
 State-of-the-art upgrade aligning the plugin with the current Claude Code / Cowork plugin specification.

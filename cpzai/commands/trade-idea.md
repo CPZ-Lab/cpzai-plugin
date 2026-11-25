@@ -2,15 +2,18 @@
 description: Generate a structured trade idea with entry, exit, sizing, and risk management — based on your portfolio context
 argument-hint: "<ticker | theme | setup>"
 allowed-tools:
-  - mcp__cpzai__list_positions
-  - mcp__cpzai__list_accounts
-  - mcp__cpzai__get_market_data
-  - mcp__cpzai__compute_risk
+  - mcp__plugin_cpzai_cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__cash_summary
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__get_bars
+  - mcp__plugin_cpzai_cpzai__compute_risk
 ---
 
 # Trade Idea
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: Trade ideas are generated for research and educational purposes only. They are not recommendations to buy or sell any security. All trading involves risk of loss. Make decisions independently and consider your own financial situation.
 
@@ -37,8 +40,9 @@ Generate a structured, institutional-quality trade idea with clear thesis, entry
 If ~~cpzai is connected:
 - Call `list_positions` to understand current exposure
 - Call `compute_risk` for portfolio-level risk metrics
-- Call `list_accounts` for available capital and buying power
+- Call `cash_summary` for available capital and buying power (last sync; note `stale`)
 - Call `get_market_data` for current prices
+- Call `get_bars` for the idea's symbol and the largest holdings (daily, one year) for levels, volatility and correlation
 
 Frame the idea relative to the user's existing portfolio — don't suggest buying something they're already overweight.
 
@@ -113,14 +117,14 @@ Sizing methods:
 | Stop Out | $XX.XX | -$XXX (-X.X%) | ~XX% |
 | Worst Case | $XX.XX | -$XXX (-XX.X%) | ~X% |
 
-**Expected value:** (P_bull × R_bull) + (P_base × R_base) + (P_stop × R_stop) = +X.X%
+**Expected value:** (P_bull × R_bull) + (P_base × R_base) + (P_stop × R_stop) + (P_worst × R_worst) = +X.X%, with the four probabilities adding up to 100%
 
 ### 6. Correlation & Portfolio Impact
 
 Assess how this trade interacts with existing positions:
 - Correlation with current holdings
-- Factor exposure overlap (are you doubling down on momentum, beta, etc.?)
-- Sector concentration after adding this trade
+- Correlation with the largest holdings, from `get_bars` daily returns (factor exposures are not available from CPZAI)
+- Sector concentration after adding this trade, from `list_positions` `sector` where recorded
 - Impact on portfolio-level VaR
 
 ### 7. Monitoring Plan

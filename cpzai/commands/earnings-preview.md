@@ -2,8 +2,8 @@
 description: Preview upcoming earnings — expectations, key metrics to watch, historical patterns, and positioning ideas
 argument-hint: "<ticker | watchlist | portfolio>"
 allowed-tools:
-  - mcp__cpzai__get_market_data
-  - mcp__cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__list_positions
   - WebSearch
   - WebFetch
 ---
@@ -11,6 +11,8 @@ allowed-tools:
 # Earnings Preview
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: Earnings previews are based on consensus estimates and historical patterns. Actual results may differ materially. This is not investment advice.
 

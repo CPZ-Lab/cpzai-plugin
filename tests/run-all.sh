@@ -12,6 +12,11 @@ mode="${1:-online}"
 echo "=== Structure validation ==="
 python3 tests/validate.py
 
+echo
+echo "=== Hook and content tests ==="
+python3 tests/test_hooks.py
+python3 tests/test_content.py
+
 if [ "$mode" != "--offline" ]; then
   echo
   echo "=== Live MCP smoke test ==="
