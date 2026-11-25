@@ -16,6 +16,7 @@ import os
 import re
 import subprocess
 import sys
+import shutil
 import tempfile
 import unittest
 from pathlib import Path
@@ -114,13 +115,48 @@ class PreTradeGuard(unittest.TestCase):
         self.assertIsNone(run_guard({"tool_name": PLUGIN_NAME.format("place_order"), "tool_input": ORDER},
                                     CLAUDE_PLUGIN_OPTION_REQUIRE_TRADE_CONFIRMATION="false"))
 
-    def test_other_tools_pass(self):
-        self.assertIsNone(run_guard({"tool_name": PLUGIN_NAME.format("list_positions"), "tool_input": {}}))
-        self.assertIsNone(run_guard({"tool_name": "mcp__other__place_order", "tool_input": ORDER}))
+    # Review of plugin #1: the guard failed open on malformed events.
+    def test_a_name_the_guard_does_not_recognise_is_asked_about(self):
+        for name in (PLUGIN_NAME.format("list_positions"), "mcp__other__place_order"):
+            out = run_guard({"tool_name": name, "tool_input": {}})
+            self.assertEqual(out["hookSpecificOutput"]["permissionDecision"], "ask", name)
 
     def test_an_unreadable_event_is_asked_about_not_let_through(self):
-        out = run_guard("not json")
+        for raw in ("not json", "", "{}", "[]", '{"tool_input": {}}', '{"tool_name": 5}', '{"tool_name": null}', '{"tool_name": ["x"]}'):
+            out = run_guard(raw)
+            self.assertIsNotNone(out, raw)
+            self.assertEqual(out["hookSpecificOutput"]["permissionDecision"], "ask", raw)
+
+    def test_a_non_object_tool_input_still_asks(self):
+        out = run_guard({"tool_name": PLUGIN_NAME.format("place_order"), "tool_input": "AAPL"})
         self.assertEqual(out["hookSpecificOutput"]["permissionDecision"], "ask")
+
+
+class SessionBanner(unittest.TestCase):
+    SCRIPT = PLUGIN / "scripts" / "session-start.sh"
+
+    def banner(self, path: str | None = None, **env: str) -> str:
+        full = {k: v for k, v in os.environ.items() if not k.startswith("CLAUDE_PLUGIN_OPTION_")}
+        full.update(env)
+        if path is not None:
+            full["PATH"] = path
+        return subprocess.run(["/bin/bash", str(self.SCRIPT)], capture_output=True, text=True, env=full, check=True).stdout
+
+    def test_confirm_is_read_the_way_the_guard_reads_it(self):
+        self.assertIn("confirm=true", self.banner())
+        self.assertIn("confirm=true", self.banner(CLAUDE_PLUGIN_OPTION_REQUIRE_TRADE_CONFIRMATION="yes please"))
+        for off in ("false", "FALSE", " off ", "0", "no"):
+            self.assertIn("confirm=false", self.banner(CLAUDE_PLUGIN_OPTION_REQUIRE_TRADE_CONFIRMATION=off), off)
+
+    def test_says_when_python3_is_missing(self):
+        self.assertIn("guard=on", self.banner())
+        with tempfile.TemporaryDirectory() as d:
+            # The tools the banner uses, and no python3.
+            for tool in ("tr", "cat"):
+                os.symlink(shutil.which(tool), os.path.join(d, tool))
+            out = self.banner(path=d)
+        self.assertIn("guard=OFF (python3 not found", out)
+        self.assertIn("confirm=false", out)
 
 
 class AuditLog(unittest.TestCase):

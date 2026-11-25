@@ -21,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - `/trade` takes a stop price, takes shares only, says orders are day orders, shows the limit and stop before approval, and never resends after a timeout; order-execution no longer offers GTC, IOC, FOK, extended hours, trailing or bracket orders through `place_order` (cpzai#3014, cpzai#3034).
 - `/strategy-builder` writes the format Strategy Lab backtests: `SYMBOLS` and one module-level `generate_signals`, `generate_signal` or `on_bar` (cpzai#3013).
 - `/positions`, `/portfolio-review`, `/risk-report` and `/orders` page until a short page instead of treating one page as the whole book (cpzai#3037).
+- The pre-trade guard fails closed: empty or malformed events, unrecognised tool names and errors inside the guard are asked about instead of passing. The session banner reads the confirmation option as the guard does and says when python3 is missing.
 
 ### Added
 - `tests/test_hooks.py` and `tests/test_content.py`, run by `tests/run-all.sh` and CI.

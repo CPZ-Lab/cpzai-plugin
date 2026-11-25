@@ -115,7 +115,9 @@ allowed-tools:
 
 ### 2. PreToolUse safety hook
 
-`cpzai/hooks/hooks.json` registers a `PreToolUse` hook for every state-changing CPZAI tool (`place_order`, `execute_strategy`, `create_strategy`, `update_strategy`, `configure_overlay`, `create_webhook`, `delete_webhook`, `sync_portfolio`, `create_connection`), under both tool spellings. The hook script (`cpzai/scripts/pre_trade_guard.py`) answers `permissionDecision: "ask"`: Claude Code shows you the call with a summary (for an order: side, quantity, symbol, type, price, account, and your default environment) and runs it once you approve. You are asked once per call, and an approved call goes through; there is no block-and-retry loop.
+`cpzai/hooks/hooks.json` registers a `PreToolUse` hook for every state-changing CPZAI tool (`place_order`, `execute_strategy`, `create_strategy`, `update_strategy`, `configure_overlay`, `create_webhook`, `delete_webhook`, `sync_portfolio`, `create_connection`), under both tool spellings. The hook script (`cpzai/scripts/pre_trade_guard.py`) answers `permissionDecision: "ask"`: Claude Code shows you the call with a summary (for an order: side, quantity, symbol, type, price, account, and your default environment) and runs it once you approve. You are asked once per call, and an approved call goes through; there is no block-and-retry loop. The guard fails closed: an event it cannot read, a tool name it does not recognise, or an error inside it is asked about, never let through. It needs `python3`; the session banner shows `guard=OFF` when python3 is missing.
+
+`add_to_watchlist` and `remove_from_watchlist` are not guarded: they change a list of at most 10 symbols to watch, move no money, place nothing and are undone by the opposite call, and asking on each would train you to approve without reading.
 
 The default environment is a reminder, not an account check: the order input carries the account id, not its environment, so the hook cannot see whether the account is paper or live. `/cpzai:trade` and the execution-reviewer agent check the account's `environment` with `list_accounts` before an order.
 

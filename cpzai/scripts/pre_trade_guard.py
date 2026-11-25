@@ -99,29 +99,44 @@ def describe(tool: str, inp: dict, default_env: str) -> str:
     return f"CPZAI: {tool} changes your CPZAI account. Approve to run it once."
 
 
-def main() -> int:
-    raw = sys.stdin.read()
+UNREADABLE = "CPZAI safety guard could not read this tool call. Review it before approving."
+
+
+def decide(raw: str) -> str | None:
+    """The reason to ask the user about this call, or None to leave the normal permission flow.
+
+    This hook only runs for the CPZAI tools hooks.json matches, so anything it
+    cannot read, or a name it does not recognise, is asked about: the guard
+    fails closed, never open.
+    """
     try:
-        event = json.loads(raw) if raw.strip() else {}
-    except json.JSONDecodeError:
+        event = json.loads(raw) if raw.strip() else None
+    except (json.JSONDecodeError, ValueError):
         event = None
     if not isinstance(event, dict):
-        # Only CPZAI's guarded tools reach this hook; one we cannot read is asked about.
-        ask("CPZAI safety guard could not read this tool call. Review it before approving.")
-        return 0
-
-    name = event.get("tool_name") or event.get("toolName") or ""
+        return UNREADABLE
+    name = event.get("tool_name") or event.get("toolName")
+    if not isinstance(name, str) or not name:
+        return UNREADABLE
     m = TOOL_NAME.match(name)
     if not m or m.group(1) not in GUARDED:
-        return 0
+        return f"CPZAI safety guard does not recognise the tool {name[:80]}. Review it before approving."
+    # The user's own opt-out (userConfig.require_trade_confirmation = false).
     if not confirmation_required():
-        return 0
-
-    tool = m.group(1)
-    inp = event.get("tool_input") or event.get("toolInput") or {}
+        return None
+    inp = event.get("tool_input") if "tool_input" in event else event.get("toolInput")
     if not isinstance(inp, dict):
         inp = {}
-    ask(describe(tool, inp, option("DEFAULT_ENVIRONMENT", "paper") or "paper"))
+    return describe(m.group(1), inp, option("DEFAULT_ENVIRONMENT", "paper") or "paper")
+
+
+def main() -> int:
+    try:
+        reason = decide(sys.stdin.read())
+    except Exception as e:  # Fail closed: an error here must never let the call through unasked.
+        reason = f"{UNREADABLE} ({type(e).__name__})"
+    if reason is not None:
+        ask(reason)
     return 0
 
 
