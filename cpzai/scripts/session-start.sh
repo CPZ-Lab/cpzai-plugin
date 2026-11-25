@@ -4,7 +4,7 @@
 # context every session.
 set -euo pipefail
 
-PLUGIN_VERSION="2.0.0"
+PLUGIN_VERSION="2.1.0"
 MCP_URL="${CPZAI_MCP_URL:-https://mcp.cpz-lab.com/mcp}"
 ENV="${CLAUDE_PLUGIN_OPTION_DEFAULT_ENVIRONMENT:-paper}"
 HAS_KEY="$([ -n "${CLAUDE_PLUGIN_OPTION_CPZ_API_KEY:-}" ] && echo "configured" || echo "OAuth/unset")"

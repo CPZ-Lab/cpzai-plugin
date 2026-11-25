@@ -11,7 +11,7 @@
 [![Claude Cowork](https://img.shields.io/badge/Claude-Cowork-000000?logo=anthropic&logoColor=white)](https://claude.com/product/cowork)
 [![Claude Code](https://img.shields.io/badge/Claude-Code-000000?logo=anthropic&logoColor=white)](https://claude.com/product/claude-code)
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue)](cpzai/LICENSE)
-[![Version](https://img.shields.io/badge/Version-2.0.0-blue)]()
+[![Version](https://img.shields.io/badge/Version-2.1.0-blue)]()
 [![Skills](https://img.shields.io/badge/Skills-10-green)]()
 [![Commands](https://img.shields.io/badge/Commands-17-green)]()
 [![Agents](https://img.shields.io/badge/Agents-3-green)]()
@@ -76,7 +76,7 @@ Claude Code prompts for your CPZ API key and secret on first use. To re-configur
 | Command | Description |
 |---------|-------------|
 | `/cpzai:strategy-builder` | Guided strategy creation — describe a trading idea and Claude writes the code |
-| `/cpzai:backtest` | Run a strategy backtest, analyze metrics, and identify improvements |
+| `/cpzai:backtest` | Analyze a strategy's saved backtest runs and identify improvements (runs start in CPZAI Strategy Lab) |
 | `/cpzai:risk-report` | Generate a risk report — VaR, Sharpe, drawdown, with recommendations |
 | `/cpzai:portfolio-review` | Full portfolio health check — positions, diversification, attribution |
 | `/cpzai:market-scan` | Scan sectors or themes with real-time quotes and context |
@@ -126,14 +126,14 @@ Read-only by design: `risk-auditor` and `execution-reviewer` cannot place orders
 
 ## MCP Tools
 
-The CPZAI MCP server provides 18 tools across 8 categories. Every tool carries a safety annotation (`readOnlyHint`, or `destructiveHint`) per the MCP specification.
+The CPZAI MCP server's main tools are below (`tools/list` has the full catalog). Every tool carries a safety annotation (`readOnlyHint`, or `destructiveHint`) per the MCP specification. [CONNECTORS.md](cpzai/CONNECTORS.md#what-the-tools-return-and-what-they-do-not) lists what each tool returns and which figures no tool provides.
 
 | Category | Read-Only | Write | Destructive |
 |----------|-----------|-------|-------------|
 | Strategies | `list_strategies`, `get_strategy` | `create_strategy`, `update_strategy` | — |
-| Backtesting | `get_backtest_results` | — | — |
-| Trading | `list_orders`, `list_positions`, `list_accounts` | `sync_portfolio` | `place_order` |
-| Market Data | `get_market_data` | — | — |
+| Backtesting | `get_backtest_results`, `get_backtest_result` (saved runs; no tool starts one) | | |
+| Trading | `list_orders`, `list_positions`, `list_accounts`, `cash_summary`, `export_transactions` | `sync_portfolio` | `place_order` |
+| Market Data | `get_market_data`, `get_bars` | | |
 | Risk | `list_risk_snapshots` | `compute_risk` | — |
 | Execution | — | — | `execute_strategy` |
 | Webhooks | `list_webhooks` | `create_webhook` | `delete_webhook` |
@@ -177,7 +177,7 @@ The `risk-auditor` agent pulls live positions, computes current VaR/Sharpe/drawd
 /cpzai:backtest my momentum strategy from 2020-01 to 2024-12 with weekly rebalance
 ```
 
-Runs the backtest, analyzes results (Sharpe, max drawdown, win rate), checks robustness across sub-periods, and suggests parameter improvements grounded in the `backtesting` skill.
+Finds the saved run for that period in your CPZAI account, analyzes it (Sharpe, max drawdown, win rate), checks robustness across sub-periods, and suggests parameter improvements grounded in the `backtesting` skill. No plugin tool starts a backtest: run it in CPZAI Strategy Lab first.
 
 ### Place a guarded order
 
@@ -210,7 +210,7 @@ The `cpzai/.mcp.json` config wires `userConfig` values into HTTP headers automat
       "headers": {
         "X-CPZ-Key": "${user_config.cpz_api_key}",
         "X-CPZ-Secret": "${user_config.cpz_api_secret}",
-        "X-CPZ-Client": "claude-plugin/2.0.0"
+        "X-CPZ-Client": "claude-plugin/2.1.0"
       }
     }
   }

@@ -6,7 +6,7 @@
       "headers": {
         "X-CPZ-Key": "${user_config.cpz_api_key}",
         "X-CPZ-Secret": "${user_config.cpz_api_secret}",
-        "X-CPZ-Client": "claude-plugin/2.0.0"
+        "X-CPZ-Client": "claude-plugin/2.1.0"
       }
     }
   }

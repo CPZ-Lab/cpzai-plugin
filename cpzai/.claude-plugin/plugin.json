@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "cpzai",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "AI-native systematic trading — build strategies, backtest, manage risk, and execute trades. Connects to CPZAI for live portfolio, market data, and order management.",
   "author": {
     "name": "CPZ Lab",
