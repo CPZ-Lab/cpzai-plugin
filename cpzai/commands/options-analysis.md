@@ -2,14 +2,17 @@
 description: Analyze options strategies, Greeks, volatility surface, and derivatives positioning for a ticker
 argument-hint: "<ticker> [strategy type]"
 allowed-tools:
-  - mcp__cpzai__get_market_data
-  - mcp__cpzai__list_positions
-  - mcp__cpzai__compute_risk
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__get_bars
+  - mcp__plugin_cpzai_cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__compute_risk
 ---
 
 # Options Analysis
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: Options involve significant risk and are not suitable for all investors. This analysis is for educational and research purposes only. All options trading decisions should be made independently with full understanding of the risks.
 
@@ -35,8 +38,11 @@ Analyze the options landscape for a given ticker — implied volatility, Greeks,
 ### 1. Current Market Context
 
 If ~~cpzai is connected:
-- Call `get_market_data` for the ticker (price, volume, recent move)
+- Call `get_market_data` for the underlying (price, volume, day move). It does not quote option contracts
+- Call `get_bars` for a year of the underlying's daily bars: realized volatility (HV) is computed from them
 - Call `compute_risk` if the user holds the underlying (portfolio context)
+
+**No CPZAI tool returns option chains, option quotes, implied volatility, IV rank, Greeks, put/call ratio, skew or term structure.** Mark each of those "not available from CPZAI" in the templates below. If the user pastes option quotes or IVs, use them and label them as user-supplied; Greeks may then be computed from them with a stated model (e.g. Black-Scholes), labeled as computed here.
 
 Establish the setup:
 

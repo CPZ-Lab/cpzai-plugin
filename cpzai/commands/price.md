@@ -2,12 +2,15 @@
 description: Get real-time quotes — price, change, volume, bid/ask — for one or more symbols
 argument-hint: "<symbols>"
 allowed-tools:
-  - mcp__cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__get_bars
 ---
 
 # Price
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 Fetch real-time market data for one or more symbols and present a clean quote summary.
 
@@ -56,6 +59,6 @@ For multiple symbols:
 ### 3. Quick Context (if single symbol)
 
 For a single ticker, add a one-line note on:
-- Where price sits relative to 52-week range
-- Unusual volume (if >1.5x average)
+- Where price sits relative to its 52-week range (from one year of `get_bars` daily bars; the quote carries no range)
+- Unusual volume (today's volume over the 20-day average from `get_bars`, if >1.5x)
 - Proximity to round numbers or key levels

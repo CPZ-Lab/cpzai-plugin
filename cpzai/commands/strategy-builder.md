@@ -2,16 +2,18 @@
 description: Build a trading strategy from a natural language idea — generates Python code and creates it on the platform
 argument-hint: "<strategy description>"
 allowed-tools:
-  - mcp__cpzai__list_strategies
-  - mcp__cpzai__get_strategy
-  - mcp__cpzai__create_strategy
-  - mcp__cpzai__update_strategy
-  - mcp__cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__list_strategies
+  - mcp__plugin_cpzai_cpzai__get_strategy
+  - mcp__plugin_cpzai_cpzai__create_strategy
+  - mcp__plugin_cpzai_cpzai__update_strategy
+  - mcp__plugin_cpzai_cpzai__get_market_data
 ---
 
 # Strategy Builder
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: This command generates strategy code to assist development. All strategies should be thoroughly backtested and reviewed before live deployment. Trading carries risk of loss.
 

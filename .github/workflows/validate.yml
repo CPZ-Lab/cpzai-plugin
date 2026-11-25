@@ -18,6 +18,10 @@ jobs:
           python-version: "3.12"
       - name: Validate plugin structure
         run: python3 tests/validate.py
+      - name: Hook and content tests
+        run: |
+          python3 tests/test_hooks.py
+          python3 tests/test_content.py
 
   smoke-mcp:
     name: Live MCP smoke test

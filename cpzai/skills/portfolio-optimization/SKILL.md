@@ -257,8 +257,8 @@ Add tax costs as asymmetric transaction costs:
 ## CPZAI Tool Chaining for Portfolio Optimization
 
 1. **`list_positions`** — get current portfolio weights and values
-2. **`get_market_data`** — fetch prices for universe + current holdings
-3. **`compute_risk`** — get current risk metrics (covariance inputs)
+2. **`get_bars`**: daily history for the universe and current holdings: expected returns and the covariance matrix are estimated from it
+3. **`compute_risk`**: current portfolio risk summary (VaR, Sharpe, drawdown); it returns no covariance inputs
 4. **Run optimization** — apply chosen method (HRP, mean-variance, risk parity) using the data above
 5. **`place_order`** — execute the rebalancing trades
 6. **`list_risk_snapshots`** — monitor risk before and after rebalancing

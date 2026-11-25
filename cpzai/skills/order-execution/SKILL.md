@@ -217,7 +217,7 @@ Available for users who need:
 When ~~cpzai is connected, execute this workflow:
 
 **Pre-trade:**
-1. **`list_accounts`** — verify which broker accounts are connected and check buying power
+1. **`list_accounts`**: verify the account is `tradable` and in the intended `environment` (paper or live); **`cash_summary`**: its buying power (last sync; unknown if `stale`)
 2. **`list_positions`** — check current holdings to avoid duplicates or unintended concentration
 3. **`get_market_data`** — get current price, bid/ask spread, and volume for the target symbol
 4. **`compute_risk`** — evaluate current portfolio risk before adding new exposure
@@ -231,7 +231,7 @@ When ~~cpzai is connected, execute this workflow:
 8. **`compute_risk`** — recompute risk metrics to verify the new position hasn't pushed the portfolio outside risk limits
 
 **For strategy-driven execution:**
-1. **`execute_strategy`** — run the strategy to generate signals
+1. **`execute_strategy`**: run the strategy (only when the user has authorized a live run: it can submit orders itself, so check `list_orders` before placing anything by hand)
 2. **`list_positions`** — compare current holdings to target portfolio
 3. **`place_order`** (multiple) — execute the rebalancing trades
 4. **`sync_portfolio`** — reconcile after all orders fill

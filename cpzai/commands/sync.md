@@ -1,14 +1,17 @@
 ---
 description: Sync your portfolio — pull latest positions, balances, and orders from all connected brokers
 allowed-tools:
-  - mcp__cpzai__sync_portfolio
-  - mcp__cpzai__list_accounts
-  - mcp__cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__sync_portfolio
+  - mcp__plugin_cpzai_cpzai__list_accounts
+  - mcp__plugin_cpzai_cpzai__cash_summary
+  - mcp__plugin_cpzai_cpzai__list_positions
 ---
 
 # Sync
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 Trigger a portfolio sync across all connected broker accounts to pull the latest positions, balances, and order status.
 
@@ -45,7 +48,7 @@ Last sync:        [Timestamp]
 ### 3. Updated Summary
 
 After sync completes, show the refreshed state:
-- Total equity across all accounts
+- Total equity across all accounts (`cash_summary` totals; say which accounts have no balance)
 - Position count
 - Any changes since last sync (new fills, position changes)
 

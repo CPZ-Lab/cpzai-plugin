@@ -2,13 +2,16 @@
 description: Screen stocks by quantitative factors — value, momentum, quality, volatility, size, and custom signals
 argument-hint: "<factor | theme> [universe]"
 allowed-tools:
-  - mcp__cpzai__get_market_data
-  - mcp__cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__get_bars
+  - mcp__plugin_cpzai_cpzai__list_positions
 ---
 
 # Factor Screen
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: Factor screens are quantitative filters for research purposes only. They do not constitute buy/sell recommendations. Factor performance is cyclical and past factor returns do not predict future results.
 
@@ -52,7 +55,10 @@ Map the user's request to specific quantitative metrics:
 
 If ~~cpzai is connected:
 - Call `get_market_data` for the universe to get current prices and volume
+- Call `get_bars` (daily, about 13 months) for the price-based factors: momentum, reversal, low volatility and beta, 52-week high proximity
 - Call `list_positions` to flag which screened stocks the user already owns
+
+**No CPZAI tool returns fundamentals** (P/E, P/B, EV/EBITDA, ROE, margins, growth, estimates, market cap, dividends). Value, quality, size, growth and dividend screens cannot be run from CPZAI data: say so, and mark those columns "not available from CPZAI" rather than filling them from memory.
 
 ### 3. Screen Results
 

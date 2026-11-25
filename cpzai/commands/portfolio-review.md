@@ -1,17 +1,21 @@
 ---
 description: Full portfolio health check — positions, performance, diversification, and actionable insights
 allowed-tools:
-  - mcp__cpzai__list_positions
-  - mcp__cpzai__list_accounts
-  - mcp__cpzai__get_market_data
-  - mcp__cpzai__compute_risk
-  - mcp__cpzai__list_orders
-  - mcp__cpzai__list_risk_snapshots
+  - mcp__plugin_cpzai_cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__list_accounts
+  - mcp__plugin_cpzai_cpzai__cash_summary
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__get_bars
+  - mcp__plugin_cpzai_cpzai__compute_risk
+  - mcp__plugin_cpzai_cpzai__list_orders
+  - mcp__plugin_cpzai_cpzai__list_risk_snapshots
 ---
 
 # Portfolio Review
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: Portfolio reviews are informational and do not constitute investment advice. Consult a qualified financial advisor before making portfolio changes.
 
@@ -31,7 +35,8 @@ No arguments needed — pulls the full portfolio from connected accounts.
 
 If ~~cpzai is connected:
 - Call `list_positions` for all open positions
-- Call `list_accounts` for account summaries (equity, buying power, margin)
+- Call `cash_summary` for equity, cash and buying power per account (last sync; note `stale`)
+- Call `list_accounts` for each account's broker and environment; it holds no balances
 - Call `get_market_data` for current prices on all holdings
 - Call `compute_risk` for the latest risk snapshot
 - Call `list_orders` with status `filled` for recent trade history
@@ -48,11 +53,8 @@ PORTFOLIO REVIEW — [Date]
 Total Equity:        $XX,XXX
 Cash / Buying Power: $XX,XXX (XX% of portfolio)
 Positions:           XX open positions
-Margin Used:         $XX,XXX
 
-Today's P&L:         $X,XXX (X.X%)
-Week P&L:            $X,XXX (X.X%)
-Month P&L:           $X,XXX (X.X%)
+Today's P&L:         $X,XXX (X.X%)   (from `get_market_data` day change x quantity)
 ```
 
 ### 3. Holdings Breakdown
@@ -78,20 +80,19 @@ Sort by weight (largest first).
 
 ### 5. Diversification Assessment
 
-**Sector Exposure:**
+**Sector Exposure** (from each position's `sector` in `list_positions`; a position with no sector recorded is listed as "sector not recorded", never assigned one from memory):
 | Sector | Weight | # Positions |
 |--------|--------|-------------|
 | ... | ... | ... |
 
 **Key Observations:**
-- Sector over/under-weights vs a benchmark (e.g. S&P 500)
 - Single-stock concentration risk (any position > 15%)
 - Cash level relative to market conditions
 - Long/short balance (if applicable)
 
 ### 6. Risk Summary
 
-Pull from the `compute_risk` results:
+Pull from the `compute_risk` results. They are today's holdings replayed over `return_window`; quote its `method_note` and never present them as the account's own track record:
 - VaR (95%, 1-day)
 - Max drawdown (current and from peak)
 - Sharpe and Sortino

@@ -2,17 +2,20 @@
 description: Place a trade — buy or sell stocks, ETFs, or crypto through your connected broker
 argument-hint: "<buy|sell> <quantity> <symbol> [order type] [limit price]"
 allowed-tools:
-  - mcp__cpzai__list_accounts
-  - mcp__cpzai__list_positions
-  - mcp__cpzai__get_market_data
-  - mcp__cpzai__place_order
-  - mcp__cpzai__list_orders
+  - mcp__plugin_cpzai_cpzai__list_accounts
+  - mcp__plugin_cpzai_cpzai__cash_summary
+  - mcp__plugin_cpzai_cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__place_order
+  - mcp__plugin_cpzai_cpzai__list_orders
   - AskUserQuestion
 ---
 
 # Trade
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: This command places real orders through your connected broker. Orders are irreversible once filled. Double-check all details before confirming. Trading carries risk of loss.
 
@@ -54,7 +57,8 @@ Parse the user's input and confirm all required fields:
 ### 2. Pre-Trade Check
 
 If ~~cpzai is connected:
-- Call `list_accounts` to verify the user has a connected broker and sufficient buying power
+- Call `list_accounts` to pick the account: it must be `tradable`, and its `environment` must be the one intended. If the account is live and the plugin's default environment is paper, stop and ask the user to confirm a live trade explicitly
+- Call `cash_summary` for that account's buying power (last sync: if `stale` is true or it has no balance source, say the buying power is not known; never assume it is sufficient)
 - Call `list_positions` to check existing exposure to this symbol
 - Call `get_market_data` to get the current price
 
@@ -75,11 +79,12 @@ Current Position: [None | XX shares @ $XXX.XX avg]
 
 ### 3. Confirm and Execute
 
-Ask for explicit confirmation before placing:
+If this session's `[cpzai v...]` banner shows `confirm=true`, the plugin's guard runs: call `place_order` with the validated parameters, and Claude Code shows the user this order and places it only after they approve it there. That approval is the confirmation, so do not ask a second time in chat.
+
+If there is no banner (the client does not run plugin hooks) or it shows `confirm=false`, nothing else will ask: ask in chat first and call `place_order` only after an explicit yes:
 > "Ready to place this order. Confirm? (yes/no)"
 
-On confirmation:
-- Call `place_order` with the validated parameters
+After the call:
 - Report the order ID and status back to the user
 
 ```

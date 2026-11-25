@@ -14,24 +14,26 @@ tools:
   - WebFetch
   - WebSearch
   - TodoWrite
-  - mcp__cpzai__list_strategies
-  - mcp__cpzai__get_strategy
-  - mcp__cpzai__create_strategy
-  - mcp__cpzai__update_strategy
-  - mcp__cpzai__execute_strategy
-  - mcp__cpzai__get_backtest_results
-  - mcp__cpzai__get_market_data
-  - mcp__cpzai__compute_risk
+  - mcp__plugin_cpzai_cpzai__list_strategies
+  - mcp__plugin_cpzai_cpzai__get_strategy
+  - mcp__plugin_cpzai_cpzai__create_strategy
+  - mcp__plugin_cpzai_cpzai__update_strategy
+  - mcp__plugin_cpzai_cpzai__get_backtest_results
+  - mcp__plugin_cpzai_cpzai__get_backtest_result
+  - mcp__plugin_cpzai_cpzai__get_bars
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__compute_risk
 skills:
   - alpha-research
   - backtesting
   - strategy-development
   - portfolio-optimization
 disallowedTools:
-  - mcp__cpzai__place_order
-  - mcp__cpzai__sync_portfolio
-  - mcp__cpzai__create_webhook
-  - mcp__cpzai__delete_webhook
+  - mcp__plugin_cpzai_cpzai__place_order
+  - mcp__plugin_cpzai_cpzai__execute_strategy
+  - mcp__plugin_cpzai_cpzai__sync_portfolio
+  - mcp__plugin_cpzai_cpzai__create_webhook
+  - mcp__plugin_cpzai_cpzai__delete_webhook
 ---
 
 # Quant Researcher

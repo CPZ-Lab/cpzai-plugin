@@ -302,9 +302,9 @@ This reveals the unique information each signal contributes. If a signal has zer
 
 ## CPZAI Tool Chaining for Alpha Research
 
-1. **`get_market_data`** — fetch current and historical prices for signal computation
+1. **`get_bars`**: historical prices for signal computation (`get_market_data` is the current quote only)
 2. **`list_strategies`** / **`get_strategy`** — review existing strategies and their signal logic
-3. **`execute_strategy`** — run a backtest with the new signal
+3. **Backtest in CPZAI Strategy Lab** (the user starts the run). No CPZAI tool starts a backtest: runs are started in CPZAI Strategy Lab. Never call `execute_strategy` to backtest; it runs the strategy's code and can submit orders.
 4. **`get_backtest_results`** — pull performance metrics (Sharpe, turnover, drawdown)
-5. **`compute_risk`** — check factor exposures of the signal-driven portfolio
+5. **`compute_risk`**: portfolio risk of the current book (it returns no factor exposures; compute any from `get_bars` and say so)
 6. **`create_strategy`** — deploy the validated signal as a new strategy

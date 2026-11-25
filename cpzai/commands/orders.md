@@ -2,13 +2,15 @@
 description: View recent orders — open, filled, cancelled — with status and fill details
 argument-hint: "[status] [symbol]"
 allowed-tools:
-  - mcp__cpzai__list_orders
-  - mcp__cpzai__list_accounts
+  - mcp__plugin_cpzai_cpzai__list_orders
+  - mcp__plugin_cpzai_cpzai__list_accounts
 ---
 
 # Orders
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 Pull your recent order history and present status, fills, and execution details.
 

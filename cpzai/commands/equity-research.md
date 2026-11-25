@@ -2,7 +2,7 @@
 description: Generate a comprehensive equity research report on any publicly traded company
 argument-hint: "<ticker | company name>"
 allowed-tools:
-  - mcp__cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__get_market_data
   - WebSearch
   - WebFetch
 ---
@@ -10,6 +10,8 @@ allowed-tools:
 # Equity Research
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: Equity research reports are for informational purposes only. They do not constitute investment advice or buy/sell recommendations. All investment decisions should be made independently.
 

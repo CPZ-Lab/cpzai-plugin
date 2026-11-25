@@ -237,7 +237,7 @@ Apply betas and correlations to estimate portfolio impact under each scenario.
 When ~~cpzai is connected, execute this workflow:
 
 1. **`list_positions`** — get all open positions with market values and entry prices
-2. **`list_accounts`** — get account equity, buying power, margin usage
+2. **`cash_summary`**: account equity and buying power as last synced (margin usage is not available from CPZAI; `list_accounts` holds no balances)
 3. **`get_market_data`** — fetch current prices for all held symbols (for real-time P&L)
 4. **`compute_risk`** — trigger a fresh risk computation (VaR, Sharpe, drawdown, beta, risk score)
 5. **`list_risk_snapshots`** — pull historical risk data (last 30 snapshots) for trend analysis

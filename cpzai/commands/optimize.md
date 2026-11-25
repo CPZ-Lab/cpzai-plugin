@@ -2,16 +2,19 @@
 description: Optimize portfolio allocation using quantitative methods — mean-variance, Black-Litterman, risk parity, or HRP
 argument-hint: "[method] [constraints]"
 allowed-tools:
-  - mcp__cpzai__list_positions
-  - mcp__cpzai__list_accounts
-  - mcp__cpzai__get_market_data
-  - mcp__cpzai__compute_risk
-  - mcp__cpzai__list_risk_snapshots
+  - mcp__plugin_cpzai_cpzai__list_positions
+  - mcp__plugin_cpzai_cpzai__cash_summary
+  - mcp__plugin_cpzai_cpzai__get_market_data
+  - mcp__plugin_cpzai_cpzai__get_bars
+  - mcp__plugin_cpzai_cpzai__compute_risk
+  - mcp__plugin_cpzai_cpzai__list_risk_snapshots
 ---
 
 # Optimize
 
 > If you see unfamiliar placeholders or need to check which tools are connected, see [CONNECTORS.md](../CONNECTORS.md).
+>
+> Use only figures a CPZAI tool returns. Anything a template below asks for that no tool provides (see [What the Tools Return](../CONNECTORS.md#what-the-tools-return-and-what-they-do-not)) is written "not available from CPZAI", never filled from memory.
 
 **Important**: Portfolio optimization outputs are model-dependent and sensitive to input assumptions. They should be treated as a starting point for analysis, not as definitive allocations. All portfolio decisions should be reviewed by qualified professionals.
 
@@ -43,8 +46,9 @@ Run portfolio optimization on your current holdings or a proposed portfolio — 
 If ~~cpzai is connected:
 - Call `list_positions` to get current holdings and weights
 - Call `get_market_data` for current prices
-- Call `compute_risk` for the current risk profile
-- Call `list_accounts` for total portfolio value
+- Call `get_bars` for daily bars of every holding (and any candidate), one to three years: expected returns and the covariance matrix are estimated from these
+- Call `compute_risk` for the current risk profile (it returns summary figures, not covariance inputs)
+- Call `cash_summary` for total equity and cash
 
 If no connection:
 > Connect your CPZAI account to optimize your live portfolio. Alternatively, provide a list of holdings (symbol, weight or dollar amount).
@@ -61,7 +65,7 @@ Positions:       XX
 Expected Return: XX.X% (annualized)
 Volatility:      XX.X% (annualized)
 Sharpe Ratio:    X.XX
-Max Drawdown:    XX.X% (historical)
+Max Drawdown:    XX.X% (current holdings replayed over the bars used)
 ```
 
 | Symbol | Current Weight | Return Contrib. | Risk Contrib. |
