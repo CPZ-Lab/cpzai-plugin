@@ -50,12 +50,14 @@ If no connection:
 PORTFOLIO REVIEW — [Date]
 ═════════════════════════
 
-Total Equity:        $XX,XXX
-Cash / Buying Power: $XX,XXX (XX% of portfolio)
+Equity (paper):      $XX,XXX     Equity (live): $XX,XXX
+Cash / Buying Power: paper $XX,XXX / $XX,XXX, live $XX,XXX / $XX,XXX
 Positions:           XX open positions
 
 Today's P&L:         $X,XXX (X.X%)   (from `get_market_data` day change x quantity)
 ```
+
+Paper and live money are never added together: `cash_summary` leaves its headline total empty when both are present, and `totals.by_environment` has each.
 
 ### 3. Holdings Breakdown
 

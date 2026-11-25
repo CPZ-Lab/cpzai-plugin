@@ -195,5 +195,17 @@ class Paging(unittest.TestCase):
             self.assertIn("until a page comes back shorter than the limit", text(rel), rel)
 
 
+class Environments(unittest.TestCase):
+    """cpzai#3120: paper and live money are never one total."""
+
+    def test_balance_lines_are_per_environment(self):
+        self.assertNotIn("Total equity across all accounts", text("commands/sync.md"))
+        self.assertIn("totals.by_environment", text("commands/sync.md"))
+        for rel in ("commands/positions.md", "commands/portfolio-review.md"):
+            body = text(rel)
+            self.assertNotIn("Total Equity:", body, rel)
+            self.assertIn("Paper and live money are never added together", body, rel)
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

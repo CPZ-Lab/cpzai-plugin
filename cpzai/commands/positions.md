@@ -41,11 +41,13 @@ If no connection:
 ```
 PORTFOLIO — [Date]
 ══════════════════
-Total Equity:     $XX,XXX.XX
-Buying Power:     $XX,XXX.XX
+Paper:            Equity $XX,XXX.XX   Buying Power $XX,XXX.XX
+Live:             Equity $XX,XXX.XX   Buying Power $XX,XXX.XX
 Positions:        XX open
 Today's P&L:      +$XXX.XX (+X.XX%)
 ```
+
+Paper and live money are never added together: `cash_summary` leaves its headline total empty when both are present, and `totals.by_environment` has each.
 
 ### 3. Holdings Table
 

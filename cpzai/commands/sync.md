@@ -48,7 +48,7 @@ Last sync:        [Timestamp]
 ### 3. Updated Summary
 
 After sync completes, show the refreshed state:
-- Total equity across all accounts (`cash_summary` totals; say which accounts have no balance)
+- Cash and buying power per environment from `cash_summary` `totals.by_environment` (paper and live on separate lines, never added together), equity per account, and which accounts have no balance
 - Position count
 - Any changes since last sync (new fills, position changes)
 
