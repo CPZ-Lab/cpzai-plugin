@@ -6,12 +6,17 @@ ${CLAUDE_PLUGIN_DATA}/audit.log, the file the compliance skill calls the
 primary audit source (cpzai#3024). Each record has:
 
   ts, event, tool          when, PostToolUse or PostToolUseFailure, which tool
-  ok                       false when the call failed or the tool answered an
-                           error or a refusal, true when it answered without
-                           one, null when the answer says neither
-  input                    the full tool input, with any credential field
-                           (key, secret, token, password) replaced by
-                           "[redacted]"; never cut short
+  ok                       false when the tool answered an error or a refusal,
+                           true when it answered without one, null when the
+                           answer says neither or the call failed without an
+                           answer (a timeout can still have placed the order:
+                           the record says to reconcile)
+  is_interrupt, duration_ms  on a failed call, as Claude Code reports them
+  input                    the full tool input, with any credential-like field
+                           replaced by "[redacted]"; create_connection's
+                           configuration is logged as its field names only;
+                           never cut short
+The log file is created owner-read/write only (0600).
   order_id, status         from the tool's answer when it carries them
                            (place_order: the broker's order id and status)
   error                    the tool's error text, when there is one
@@ -28,15 +33,38 @@ import re
 import sys
 from pathlib import Path
 
-SENSITIVE = re.compile(r"(key|secret|token|password|passphrase)", re.I)
+SENSITIVE = re.compile(r"(key|secret|token|passw|passphrase|pass|pwd|pin|auth|credential|bearer|cookie|private|signature)", re.I)
+# Identifiers are not secrets: an order's broker_credential_id and account_id say which
+# account it went to, and the audit needs them.
+NOT_SECRET = re.compile(r"(_id|_ids)$", re.I)
+
+# Tools whose outcome is unknown when the call fails without an answer: the request may
+# have reached the broker or the platform before the failure.
+STATE_CHANGING = {
+    "place_order", "execute_strategy", "create_strategy", "update_strategy", "configure_overlay",
+    "create_webhook", "delete_webhook", "sync_portfolio", "create_connection",
+}
+TRADING = {"place_order", "execute_strategy"}
+TOOL_NAME = re.compile(r"^mcp__(?:plugin_cpzai_)?cpzai__([a-z0-9_]+)$")
 
 
 def redact(value):
     if isinstance(value, dict):
-        return {k: ("[redacted]" if SENSITIVE.search(str(k)) else redact(v)) for k, v in value.items()}
+        out = {}
+        for k, v in value.items():
+            key = str(k)
+            out[k] = "[redacted]" if SENSITIVE.search(key) and not NOT_SECRET.search(key) else redact(v)
+        return out
     if isinstance(value, list):
         return [redact(v) for v in value]
     return value
+
+
+def logged_input(tool: str, inp):
+    """The input as logged: redacted; a connection's configuration as its key names only."""
+    if isinstance(inp, dict) and tool == "create_connection" and isinstance(inp.get("configuration"), dict):
+        inp = {**inp, "configuration": {"fields": sorted(str(k) for k in inp["configuration"])}}
+    return redact(inp)
 
 
 def answer_body(resp):
@@ -80,13 +108,26 @@ def record(event: dict) -> dict:
     ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     name = event.get("hook_event_name") or event.get("hookEventName") or "PostToolUse"
     tool = event.get("tool_name") or event.get("toolName") or ""
+    m = TOOL_NAME.match(tool) if isinstance(tool, str) else None
+    short = m.group(1) if m else ""
     inp = event.get("tool_input") if "tool_input" in event else event.get("toolInput")
-    rec = {"ts": ts, "event": name, "tool": tool, "ok": None, "input": redact(inp)}
+    rec = {"ts": ts, "event": name, "tool": tool, "ok": None, "input": logged_input(short, inp)}
 
     if name == "PostToolUseFailure":
-        rec["ok"] = False
         err = event.get("error") or event.get("tool_error") or "the tool call failed"
         rec["error"] = err if isinstance(err, str) else json.dumps(err)
+        rec["is_interrupt"] = event.get("is_interrupt")
+        rec["duration_ms"] = event.get("duration_ms")
+        if short in STATE_CHANGING:
+            # No answer is not "not done": a timed-out order may have been placed.
+            rec["ok"] = None
+            rec["outcome"] = (
+                "unknown: reconcile with list_orders before any resubmission"
+                if short in TRADING
+                else "unknown: check the resource before retrying"
+            )
+        else:
+            rec["ok"] = False
         return rec
 
     resp = event.get("tool_response") if "tool_response" in event else event.get("toolResponse")
@@ -121,7 +162,11 @@ def main() -> int:
             # Not the raw event: it can hold a credential (create_connection).
             "raw_length": len(raw),
         }
-    with open(data_dir / "audit.log", "a") as f:
+    path = data_dir / "audit.log"
+    # Owner-only: the log holds order details and account ids.
+    fd = os.open(path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
+    os.chmod(path, 0o600)
+    with os.fdopen(fd, "a") as f:
         f.write(json.dumps(rec, separators=(",", ":")) + "\n")
     return 0
 

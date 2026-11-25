@@ -216,11 +216,46 @@ class AuditLog(unittest.TestCase):
         self.assertIs(rec["ok"], True)
         self.assertEqual((rec["order_id"], rec["status"]), ("alp-123", "accepted"))
 
-    def test_a_call_that_failed_outright_is_logged(self):
+    # Re-review: a timed-out order may have been placed, so its outcome is unknown, not false.
+    def test_a_trading_call_that_failed_without_an_answer_is_logged_as_unknown(self):
         rec = self.run_audit({"hook_event_name": "PostToolUseFailure", "tool_name": PLUGIN_NAME.format("place_order"),
-                              "tool_input": ORDER, "error": "MCP request timed out"})
-        self.assertIs(rec["ok"], False)
+                              "tool_input": ORDER, "error": "MCP request timed out", "is_interrupt": False, "duration_ms": 60012})
+        self.assertIsNone(rec["ok"])
+        self.assertEqual(rec["outcome"], "unknown: reconcile with list_orders before any resubmission")
         self.assertEqual(rec["error"], "MCP request timed out")
+        self.assertEqual((rec["is_interrupt"], rec["duration_ms"]), (False, 60012))
+
+    def test_other_state_changing_failures_are_unknown_too(self):
+        rec = self.run_audit({"hook_event_name": "PostToolUseFailure", "tool_name": PLUGIN_NAME.format("create_strategy"),
+                              "tool_input": {"title": "x"}, "error": "socket hang up", "is_interrupt": True, "duration_ms": 5})
+        self.assertIsNone(rec["ok"])
+        self.assertEqual(rec["outcome"], "unknown: check the resource before retrying")
+        self.assertIs(rec["is_interrupt"], True)
+
+    def test_redaction_covers_credential_like_fields_but_keeps_identifiers(self):
+        rec = self.run_audit({"tool_name": PLUGIN_NAME.format("place_order"), "tool_response": {"isError": False},
+                              "tool_input": {**ORDER, "Authorization": "Bearer abc", "x_bearer": "abc", "cookie": "c=1",
+                                             "pass": "p", "pwd": "p", "pin": "1234", "private_key_pem": "k", "signature": "s",
+                                             "credential": "c", "nested": {"auth_header": "h", "note": "fine"}}})
+        inp = rec["input"]
+        for k in ("Authorization", "x_bearer", "cookie", "pass", "pwd", "pin", "private_key_pem", "signature", "credential"):
+            self.assertEqual(inp[k], "[redacted]", k)
+        self.assertEqual(inp["nested"], {"auth_header": "[redacted]", "note": "fine"})
+        # Which account the order went to stays on record.
+        self.assertEqual(inp["broker_credential_id"], ORDER["broker_credential_id"])
+        self.assertEqual(inp["account_id"], ORDER["account_id"])
+
+    def test_a_connection_configuration_is_logged_as_key_names_only(self):
+        rec = self.run_audit({"tool_name": PLUGIN_NAME.format("create_connection"), "tool_response": {"isError": False},
+                              "tool_input": {"connection_type": "vipe", "configuration": {"base_url": "https://x", "login": "me@example.com"}}})
+        self.assertEqual(rec["input"]["configuration"], {"fields": ["base_url", "login"]})
+        self.assertNotIn("me@example.com", json.dumps(rec))
+
+    def test_the_log_is_owner_only(self):
+        with tempfile.TemporaryDirectory() as d:
+            env = {**os.environ, "CLAUDE_PLUGIN_DATA": d}
+            subprocess.run([str(AUDIT)], input=json.dumps({"tool_name": PLUGIN_NAME.format("place_order")}), text=True, env=env, check=True)
+            self.assertEqual(os.stat(Path(d) / "audit.log").st_mode & 0o777, 0o600)
 
     def test_the_whole_order_is_kept_and_credentials_are_not(self):
         long_order = {**ORDER, "order_type": "stop_limit", "stop_price": 199.5, "client_order_id": "c" * 50}
